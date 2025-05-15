@@ -22,7 +22,6 @@ class NavigationState(
         navigateTo(Screen.AudioPlayerScreen.route)
     }
 }
-
 @Composable
 fun rememberNavigationState(
     navHostController: NavHostController = rememberNavController()
@@ -31,3 +30,4 @@ fun rememberNavigationState(
         NavigationState(navHostController)
     }
 }
+
