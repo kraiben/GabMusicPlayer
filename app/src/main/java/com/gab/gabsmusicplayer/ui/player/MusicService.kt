@@ -19,11 +19,9 @@ class MusicService : MediaSessionService() {
             .build()
         ExoPlayer.Builder(this)
             .setAudioAttributes(attributes, true)
-            .setHandleAudioBecomingNoisy(false)
+            .setHandleAudioBecomingNoisy(true)
             .build().apply { repeatMode = ExoPlayer.REPEAT_MODE_ALL }
     }
-    private var lastClickTime = 0L
-    private var clickCount = 0
     private val mediaSession by lazy {
         MediaSession.Builder(this, player).setCallback(
             @UnstableApi

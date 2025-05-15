@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.GabsMusicPlayer" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.GabsMusicPlayer" parent="android:Theme.Material.NoActionBar">
+        <!-- Цвет навигационной панели -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Если нужно, чтобы кнопки были тёмными -->
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+<!--    <style name="Theme.GabsMusicPlayer" parent="android:Theme.Material.Light.NoActionBar" />-->
 </resources>
