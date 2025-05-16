@@ -58,8 +58,7 @@ fun MusicPlayerScreen(
     isShuffled: Boolean = false,
     isOneRepeating: Boolean = false,
     onPreviousButtonClick: () -> Unit,
-    onPauseButtonClick: () -> Unit,
-    onPlayButtonClick: () -> Unit,
+    onPlayPauseButtonClick: () -> Unit,
     onNextButtonClick: () -> Unit,
     onSliderChange: (Long) -> Unit,
     onShuffleButtonClick: () -> Unit = {},
@@ -120,8 +119,7 @@ fun MusicPlayerScreen(
             }
 
             IconButton(onClick = {
-                if (isTrackPlaying) onPauseButtonClick()
-                else onPlayButtonClick()
+                onPlayPauseButtonClick()
             }) {
                 Icon(
                     if (isTrackPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
