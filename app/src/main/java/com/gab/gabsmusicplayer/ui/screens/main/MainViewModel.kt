@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
@@ -17,7 +18,6 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.gab.gabsmusicplayer.data.repository.MusicRepositoryImpl
 import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
-import com.gab.gabsmusicplayer.ui.navigation.NavigationState
 import com.gab.gabsmusicplayer.ui.player.MusicService
 import com.gab.gabsmusicplayer.utils.GAB_CHECK
 import com.gab.gabsmusicplayer.utils.setPlaylist
@@ -35,11 +35,11 @@ class MainViewModel @Inject constructor(
     val mediaController = mutableStateOf<MediaController?>(null)
     var currentMediaItem by mutableStateOf(mediaController.value?.currentMediaItem)
     var isTrackPlaying by mutableStateOf(mediaController.value?.isPlaying ?: false)
-    var currentPosition by mutableStateOf(mediaController.value?.currentPosition ?: 0L)
+    var currentPosition by mutableLongStateOf(mediaController.value?.currentPosition ?: 0L)
     var title by mutableStateOf(currentMediaItem?.mediaMetadata?.title.toString())
     var artist by mutableStateOf(currentMediaItem?.mediaMetadata?.artist.toString())
-    var duration by mutableStateOf(currentMediaItem?.mediaMetadata?.durationMs ?: 1L)
-    var imageUri by mutableStateOf(
+    var duration by mutableLongStateOf(currentMediaItem?.mediaMetadata?.durationMs ?: 1L)
+    var imageUri: Uri by mutableStateOf(
         currentMediaItem?.mediaMetadata?.artworkUri ?: Uri.EMPTY
     )
     var isRepeatingOne by mutableStateOf(
@@ -110,33 +110,57 @@ class MainViewModel @Inject constructor(
 
     fun selectTrack(
         tracks: List<TrackInfoModel>,
-        startIndex: Int,
+        startIndex: Int = 0,
         context: Context,
-        navigationState: NavigationState,
+        navigateToPlayer: () -> Unit,
+        isShuffled: Boolean = false
     ) {
         if (mediaController.value == null) {
-            val intent = Intent(context, MusicService::class.java)
-            ContextCompat.startForegroundService(context, intent)
-            val sessionToken = SessionToken(
-                context,
-                ComponentName(context, MusicService::class.java)
+            initializePlayer(
+                tracks = tracks,
+                startIndex = startIndex,
+                context = context,
+                navigateToPlayer = navigateToPlayer,
+                isShuffled = isShuffled
             )
-            val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
-            controllerFuture.addListener({
-                mediaController.value = controllerFuture.get().also {
-                    it.addListener(listener)
-                    it.setPlaylist(tracks, startIndex)
-                    updateStateFromController()
-                    startPositionUpdates()
-                    navigationState.navigateToPlayer()
-                }
-            }, ContextCompat.getMainExecutor(context))
+            return
+        }
+        if (isShuffled) {
+            mediaController.value?.setPlaylist(tracks, isShuffled = true)
+            navigateToPlayer()
             return
         }
         if (mediaController.value?.currentMediaItem?.mediaMetadata?.title != tracks[startIndex].title) {
             mediaController.value?.setPlaylist(tracks, startIndex)
         }
-        navigationState.navigateToPlayer()
+        navigateToPlayer()
+    }
+
+    private fun initializePlayer(
+        tracks: List<TrackInfoModel>,
+        startIndex: Int = 0,
+        context: Context,
+        navigateToPlayer: () -> Unit,
+        isShuffled: Boolean = false
+    ) {
+
+        val intent = Intent(context, MusicService::class.java)
+        ContextCompat.startForegroundService(context, intent)
+        val sessionToken = SessionToken(
+            context,
+            ComponentName(context, MusicService::class.java)
+        )
+        val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
+        controllerFuture.addListener({
+            mediaController.value = controllerFuture.get().also {
+                it.addListener(listener)
+                it.setPlaylist(tracks, startIndex, isShuffled )
+                it.shuffleModeEnabled = isShuffled
+                updateStateFromController()
+                startPositionUpdates()
+                navigateToPlayer()
+            }
+        }, ContextCompat.getMainExecutor(context))
     }
 
     private fun updateStateFromController() {
@@ -155,7 +179,7 @@ class MainViewModel @Inject constructor(
 
     private fun startPositionUpdates() {
         viewModelScope.launch {
-            while (isActive) {  // Используем isActive вместо true
+            while (isActive) {
                 delay(250)
                 mediaController.value?.let {
                     currentPosition = it.currentPosition
@@ -164,28 +188,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    //    private fun setPlaylist(tracks: List<TrackInfoModel>, startIndex: Int) {
-//        mediaController.value?.apply {
-//            val mediaItems = tracks.map {
-//                MediaItem.Builder()
-//                    .setUri(it.path)
-//                    .setMediaId(it.id.toString())
-//                    .setMediaMetadata(
-//                        MediaMetadata.Builder()
-//                            .setTitle(it.title)
-//                            .setArtworkUri(it.albumArtUri)
-//                            .setArtist(it.artist)
-//                            .setDurationMs(it.duration)
-//                            .build()
-//                    )
-//                    .build()
-//            }
-//            setMediaItems(mediaItems)
-//            seekTo(startIndex, 0L)
-//            prepare()
-//            play()
-//        }
-//    }
     override fun onCleared() {
         GAB_CHECK("ON CLEARED CALLED ON MAIN_VIEW_MODEL")
         super.onCleared()

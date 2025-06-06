@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 @Composable
 fun MusicNavGraph(
     navHostController: NavHostController,
-    audioPlayerScreenContent: @Composable () -> Unit,
+//    audioPlayerScreenContent: @Composable () -> Unit,
     allTracksScreenContent: @Composable () -> Unit,
 ) {
 
@@ -16,12 +16,12 @@ fun MusicNavGraph(
         navController = navHostController,
         startDestination = Screen.AllPlaylistsScreen.route
     ) {
-        composable(
-            route = Screen.AudioPlayerScreen.route,
-
-        ) {
-            audioPlayerScreenContent()
-        }
+//        composable(
+//            route = Screen.AudioPlayerScreen.route,
+//
+//        ) {
+//            audioPlayerScreenContent()
+//        }
         composable(
             route = Screen.AllPlaylistsScreen.route
             ) {

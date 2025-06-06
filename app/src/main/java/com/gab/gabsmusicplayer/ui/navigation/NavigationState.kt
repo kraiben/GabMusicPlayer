@@ -18,9 +18,9 @@ class NavigationState(
             launchSingleTop = true
         }
     }
-    fun navigateToPlayer() {
-        navigateTo(Screen.AudioPlayerScreen.route)
-    }
+//    fun navigateToPlayer() {
+//        navigateTo(Screen.AudioPlayerScreen.route)
+//    }
 }
 @Composable
 fun rememberNavigationState(
