@@ -65,7 +65,12 @@ fun MusicPlayerScreen(
     onRepeatModeButtonClick: () -> Unit = {},
 
     ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+
+    Column(
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+    ) {
         AsyncImage(
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,8 +81,14 @@ fun MusicPlayerScreen(
                 .build())
         )
         Text(
-            text = title, maxLines = 1, fontSize = 28.sp, fontWeight = FontWeight.W400, overflow = TextOverflow.Ellipsis
-            , modifier = Modifier.wrapContentHeight().padding(horizontal = 12.dp)
+            text = title,
+            maxLines = 1,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.W400,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .wrapContentHeight()
+                .padding(horizontal = 12.dp)
         )
         Spacer(
             modifier = Modifier.size(8.dp)
@@ -87,8 +98,10 @@ fun MusicPlayerScreen(
             maxLines = 1,
             fontSize = 12.sp,
             fontWeight = FontWeight.W100,
-            modifier = Modifier.wrapContentHeight().padding(horizontal = 12.dp) ,
-        overflow = TextOverflow.Ellipsis
+            modifier = Modifier
+                .wrapContentHeight()
+                .padding(horizontal = 12.dp),
+            overflow = TextOverflow.Ellipsis
         )
 
         MediaPlayerSlider(
@@ -129,8 +142,11 @@ fun MusicPlayerScreen(
             IconButton(onClick = { onNextButtonClick() }) {
                 Icon(Icons.Default.SkipNext, "Next", modifier = Modifier.size(80.dp))
             }
-            IconButton(onClick = {onRepeatModeButtonClick()}) {
-                Icon(contentDescription = null, imageVector = if (isOneRepeating) Icons.Default.RepeatOne else Icons.Default.Repeat)
+            IconButton(onClick = { onRepeatModeButtonClick() }) {
+                Icon(
+                    contentDescription = null,
+                    imageVector = if (isOneRepeating) Icons.Default.RepeatOne else Icons.Default.Repeat
+                )
             }
         }
     }

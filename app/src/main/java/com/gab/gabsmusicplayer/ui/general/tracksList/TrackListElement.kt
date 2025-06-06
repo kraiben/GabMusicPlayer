@@ -2,8 +2,6 @@ package com.gab.gabsmusicplayer.ui.general.tracksList
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -11,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.gab.gabsmusicplayer.R
@@ -23,7 +20,7 @@ fun TrackListElement(
     modifier: Modifier
 ) {
     ListItem(
-        modifier = modifier.fillMaxWidth().height(52.dp),
+        modifier = modifier,
         leadingContent = {
             AsyncImage(
                 modifier = Modifier
