@@ -20,6 +20,7 @@ import com.gab.gabsmusicplayer.data.repository.MusicRepositoryImpl
 import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
 import com.gab.gabsmusicplayer.ui.player.MusicService
 import com.gab.gabsmusicplayer.utils.GAB_CHECK
+import com.gab.gabsmusicplayer.utils.moveTrackToStartOfQuery
 import com.gab.gabsmusicplayer.utils.setPlaylist
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -30,22 +31,32 @@ class MainViewModel @Inject constructor(
     private val repository: MusicRepositoryImpl,
 ) : ViewModel() {
 
-//    val tracks = repository.getTracks()
-
     val mediaController = mutableStateOf<MediaController?>(null)
-    var currentMediaItem by mutableStateOf(mediaController.value?.currentMediaItem)
-    var isTrackPlaying by mutableStateOf(mediaController.value?.isPlaying ?: false)
-    var currentPosition by mutableLongStateOf(mediaController.value?.currentPosition ?: 0L)
-    var title by mutableStateOf(currentMediaItem?.mediaMetadata?.title.toString())
-    var artist by mutableStateOf(currentMediaItem?.mediaMetadata?.artist.toString())
-    var duration by mutableLongStateOf(currentMediaItem?.mediaMetadata?.durationMs ?: 1L)
+    var currentMediaItem by mutableStateOf(MediaItem.EMPTY)
+    var isTrackPlaying by mutableStateOf(false)
+    var currentPosition by mutableLongStateOf(0L)
+    var title by mutableStateOf("")
+    var artist by mutableStateOf("")
+    var duration by mutableLongStateOf(1L)
     var imageUri: Uri by mutableStateOf(
-        currentMediaItem?.mediaMetadata?.artworkUri ?: Uri.EMPTY
+        currentMediaItem.mediaMetadata.artworkUri ?: Uri.EMPTY
     )
     var isRepeatingOne by mutableStateOf(
         mediaController.value?.repeatMode == Player.REPEAT_MODE_ONE
     )
-    var isShuffled by mutableStateOf(mediaController.value?.shuffleModeEnabled ?: false)
+    var isShuffleModeSet by mutableStateOf(false)
+
+    private val queryExt = mutableListOf<TrackInfoModel>()
+
+    fun setNextTrack(track: TrackInfoModel) {
+        mediaController.value?.let { mc ->
+            if (mc.currentMediaItem?.mediaId == track.id.toString()) return
+            queryExt.add(0, track)
+            if (mc.shuffleModeEnabled) mc.shuffleModeEnabled = false
+            mc.moveTrackToStartOfQuery(track)
+            GAB_CHECK("____________________")
+        }
+    }
 
     private val listener = object : Player.Listener {
         override fun onRepeatModeChanged(repeatMode: Int) {
@@ -54,8 +65,9 @@ class MainViewModel @Inject constructor(
         }
 
         override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+            GAB_CHECK("onShuffleModeEnabledChanged")
             super.onShuffleModeEnabledChanged(shuffleModeEnabled)
-            isShuffled = shuffleModeEnabled
+            if (queryExt.isEmpty()) isShuffleModeSet = shuffleModeEnabled
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -65,34 +77,52 @@ class MainViewModel @Inject constructor(
 
         override fun onPlaylistMetadataChanged(mediaMetadata: MediaMetadata) {
             super.onPlaylistMetadataChanged(mediaMetadata)
-            currentMediaItem = mediaController.value?.currentMediaItem
-            title = currentMediaItem?.mediaMetadata?.title.toString()
-            artist = currentMediaItem?.mediaMetadata?.artist.toString()
-            duration = currentMediaItem?.mediaMetadata?.durationMs ?: 0L
-            imageUri = currentMediaItem?.mediaMetadata?.artworkUri ?: Uri.EMPTY
+            currentMediaItem = mediaController.value?.currentMediaItem ?: MediaItem.EMPTY
+            title = currentMediaItem.mediaMetadata.title.toString()
+            artist = currentMediaItem.mediaMetadata.artist.toString()
+            duration = currentMediaItem.mediaMetadata.durationMs ?: 0L
+            imageUri = currentMediaItem.mediaMetadata.artworkUri ?: Uri.EMPTY
         }
 
         override fun onIsLoadingChanged(isLoading: Boolean) {
             super.onIsLoadingChanged(isLoading)
-            currentMediaItem = mediaController.value?.currentMediaItem
-            title = currentMediaItem?.mediaMetadata?.title.toString()
-            artist = currentMediaItem?.mediaMetadata?.artist.toString()
-            duration = currentMediaItem?.mediaMetadata?.durationMs ?: 0L
-            imageUri = currentMediaItem?.mediaMetadata?.artworkUri ?: Uri.EMPTY
+            currentMediaItem = mediaController.value?.currentMediaItem ?: MediaItem.EMPTY
+            title = currentMediaItem.mediaMetadata.title.toString()
+            artist = currentMediaItem.mediaMetadata.artist.toString()
+            duration = currentMediaItem.mediaMetadata.durationMs ?: 0L
+            imageUri = currentMediaItem.mediaMetadata.artworkUri ?: Uri.EMPTY
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            GAB_CHECK("queryExt.size ${queryExt.size}")
+            GAB_CHECK("reason: $reason")
             super.onMediaItemTransition(mediaItem, reason)
-            currentMediaItem = mediaController.value?.currentMediaItem
-            title = currentMediaItem?.mediaMetadata?.title.toString()
-            artist = currentMediaItem?.mediaMetadata?.artist.toString()
-            duration = currentMediaItem?.mediaMetadata?.durationMs ?: 0L
-            imageUri = currentMediaItem?.mediaMetadata?.artworkUri ?: Uri.EMPTY
+            currentMediaItem = mediaController.value?.currentMediaItem ?: MediaItem.EMPTY
+            title = currentMediaItem.mediaMetadata.title.toString()
+            artist = currentMediaItem.mediaMetadata.artist.toString()
+            duration = currentMediaItem.mediaMetadata.durationMs ?: 0L
+            imageUri = currentMediaItem.mediaMetadata.artworkUri ?: Uri.EMPTY
+            mediaController.value?.let { mc ->
+                if (queryExt.isEmpty()) {
+                    mc.shuffleModeEnabled = isShuffleModeSet
+                } else {
+                    val curTrackId = currentMediaItem.mediaId
+                    queryExt.removeAll {
+                        it.id.toString() == curTrackId
+                    }
+                }
+            }
         }
     }
 
-    fun nextTrack() = mediaController.value?.seekToNext()
-    fun previousTrack() = mediaController.value?.seekToPrevious()
+    fun nextTrack() {
+        mediaController.value?.seekToNext()
+    }
+
+    fun previousTrack() {
+        mediaController.value?.seekToPrevious()
+    }
+
     fun playPauseChange() {
         if (isTrackPlaying) mediaController.value?.pause()
         else mediaController.value?.play()
@@ -100,8 +130,14 @@ class MainViewModel @Inject constructor(
 
     fun onSliderChange(position: Long) = mediaController.value?.seekTo(position)
     fun shuffleStateChange() {
-        mediaController.value?.shuffleModeEnabled =
-            !(mediaController.value?.shuffleModeEnabled ?: false)
+        if (queryExt.isNotEmpty()) {
+            GAB_CHECK(12)
+            isShuffleModeSet = !isShuffleModeSet
+        } else {
+            GAB_CHECK(13)
+            mediaController.value?.shuffleModeEnabled =
+                !(mediaController.value?.shuffleModeEnabled ?: return)
+        }
     }
 
     fun isRepeatingOneStateChange() = if (isRepeatingOne) {
@@ -113,7 +149,7 @@ class MainViewModel @Inject constructor(
         startIndex: Int = 0,
         context: Context,
         navigateToPlayer: () -> Unit,
-        isShuffled: Boolean = false
+        isShuffled: Boolean = false,
     ) {
         if (mediaController.value == null) {
             initializePlayer(
@@ -127,11 +163,13 @@ class MainViewModel @Inject constructor(
         }
         if (isShuffled) {
             mediaController.value?.setPlaylist(tracks, isShuffled = true)
+            queryExt.clear()
             navigateToPlayer()
             return
         }
         if (mediaController.value?.currentMediaItem?.mediaMetadata?.title != tracks[startIndex].title) {
-            mediaController.value?.setPlaylist(tracks, startIndex)
+            queryExt.clear()
+            mediaController.value?.setPlaylist(tracks, startIndex, isShuffled = isShuffleModeSet)
         }
         navigateToPlayer()
     }
@@ -141,7 +179,7 @@ class MainViewModel @Inject constructor(
         startIndex: Int = 0,
         context: Context,
         navigateToPlayer: () -> Unit,
-        isShuffled: Boolean = false
+        isShuffled: Boolean = false,
     ) {
 
         val intent = Intent(context, MusicService::class.java)
@@ -154,7 +192,7 @@ class MainViewModel @Inject constructor(
         controllerFuture.addListener({
             mediaController.value = controllerFuture.get().also {
                 it.addListener(listener)
-                it.setPlaylist(tracks, startIndex, isShuffled )
+                it.setPlaylist(tracks, startIndex, isShuffled)
                 it.shuffleModeEnabled = isShuffled
                 updateStateFromController()
                 startPositionUpdates()
@@ -165,15 +203,15 @@ class MainViewModel @Inject constructor(
 
     private fun updateStateFromController() {
         mediaController.value?.let { controller ->
-            currentMediaItem = controller.currentMediaItem
+            currentMediaItem = controller.currentMediaItem ?: MediaItem.EMPTY
             isTrackPlaying = controller.isPlaying
             currentPosition = controller.currentPosition
-            title = controller.currentMediaItem?.mediaMetadata?.title.toString()
-            artist = controller.currentMediaItem?.mediaMetadata?.artist.toString()
-            duration = controller.currentMediaItem?.mediaMetadata?.durationMs ?: 0L
-            imageUri = controller.currentMediaItem?.mediaMetadata?.artworkUri ?: Uri.EMPTY
+            title = currentMediaItem.mediaMetadata.title.toString()
+            artist = currentMediaItem.mediaMetadata.artist.toString()
+            duration = currentMediaItem.mediaMetadata.durationMs ?: 0L
+            imageUri = currentMediaItem.mediaMetadata.artworkUri ?: Uri.EMPTY
             isRepeatingOne = controller.repeatMode == Player.REPEAT_MODE_ONE
-            isShuffled = controller.shuffleModeEnabled
+            isShuffleModeSet = controller.shuffleModeEnabled
         }
     }
 
@@ -194,5 +232,4 @@ class MainViewModel @Inject constructor(
         mediaController.value?.removeListener(listener)
         mediaController.value?.release()
     }
-
 }

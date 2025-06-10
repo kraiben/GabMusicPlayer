@@ -20,12 +20,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -60,8 +63,8 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
-
     )
+    val snackbarHostState = remember { SnackbarHostState() }
     val navItems = listOf<NavigationItem>(NavigationItem.AllTracks)
     val navBackStackEntry by navigationState.navHostController
         .currentBackStackEntryAsState()
@@ -89,7 +92,9 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                 )
             }
         ) {
+
             Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
                 bottomBar = {
                     if ((viewModel.title != "null") && (viewModel.imageUri.toString() != "")) {
                         MiniPlayer(
@@ -128,7 +133,9 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                                     )
                                 },
                                 modifier = Modifier.padding(it),
-                                menuButtonClickListener = {scope.launch{drawerState.open()}}
+                                menuButtonClickListener = {scope.launch{drawerState.open()}},
+                                addInOrderOption = {viewModel.setNextTrack(it)},
+                                snackbarHostState = snackbarHostState
                             )
                         }
                     )
@@ -145,7 +152,7 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                                 artist = viewModel.artist,
                                 duration = viewModel.duration,
                                 imageUri = viewModel.imageUri,
-                                isShuffled = viewModel.isShuffled,
+                                isShuffled = viewModel.isShuffleModeSet,
                                 isOneRepeating = viewModel.isRepeatingOne,
                                 onPreviousButtonClick = { viewModel.previousTrack() },
                                 onPlayPauseButtonClick = { viewModel.playPauseChange() },
@@ -156,7 +163,6 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                             )
                         }
                     }
-
                 }
             }
         }

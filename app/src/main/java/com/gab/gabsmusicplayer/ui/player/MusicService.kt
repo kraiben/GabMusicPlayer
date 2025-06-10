@@ -24,7 +24,6 @@ class MusicService : MediaSessionService() {
     }
     private val mediaSession by lazy {
         MediaSession.Builder(this, player).setCallback(
-            @UnstableApi
             object : MediaSession.Callback {
                 @OptIn(UnstableApi::class)
                 override fun onConnect(
@@ -52,18 +51,6 @@ class MusicService : MediaSessionService() {
             }
         ).build()
     }
-
-
-//    private val component by lazy {
-//        (application as MusicApplication).musicComponent
-//    }
-
-    override fun onCreate() {
-        super.onCreate()
-
-    }
-
-
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession =
         mediaSession
 
