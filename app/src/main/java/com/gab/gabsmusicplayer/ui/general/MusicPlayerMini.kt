@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -71,7 +72,8 @@ fun MusicPlayerMini(
 
                     ) {
                     AsyncImage(
-                        model = if (!trackInfo.albumArtUri.isOpaque) R.drawable.megumindk
+                        contentScale = ContentScale.Crop,
+                        model = if (!trackInfo.albumArtUri.isOpaque) R.drawable.gpic_megumindk
                         else trackInfo.albumArtUri,
                         contentDescription = null,
                         modifier = Modifier.size(40.dp)
@@ -151,3 +153,4 @@ fun MusicPlayerMini(
         }
     }
 }
+

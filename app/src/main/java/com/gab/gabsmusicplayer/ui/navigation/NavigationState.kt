@@ -5,6 +5,8 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
+import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistChangesScreenMode
 
 class NavigationState(
     val navHostController: NavHostController,
@@ -16,15 +18,45 @@ class NavigationState(
             }
             restoreState = true
             launchSingleTop = true
+
         }
     }
-//    fun navigateToPlayer() {
-//        navigateTo(Screen.AudioPlayerScreen.route)
-//    }
+
+    fun navigateToPlaylist(playlistId: Long) {
+        navHostController.navigate(Screen.SinglePlaylistScreen.getRouteWithArgs(playlistId))
+    }
+
+    fun navigateToPlaylistEditScreen(
+        playlist: PlaylistInfoModel,
+        screenMode: PlaylistChangesScreenMode,
+
+    ) {
+        navHostController.navigate(
+            Screen.PlaylistEditOrAddScreen.getRouteWithArgs(
+                playlist,
+                screenMode
+            )
+        )
+    }
+
+    fun returnFromPlaylistEditOrAddScreen() {
+        if (navHostController.currentDestination?.route == Screen.PlaylistEditOrAddScreen.route) {
+            navHostController.popBackStack()
+        }
+    }
+    fun returnFromPlaylistEditOrAddScreenAfterRemovingPlaylist() {
+        navHostController.navigate(Screen.Playlist.route) {
+            popUpTo(Screen.Playlist.route) {
+                inclusive = true
+                saveState = false
+            }
+        }
+    }
 }
+
 @Composable
 fun rememberNavigationState(
-    navHostController: NavHostController = rememberNavController()
+    navHostController: NavHostController = rememberNavController(),
 ): NavigationState {
     return remember {
         NavigationState(navHostController)

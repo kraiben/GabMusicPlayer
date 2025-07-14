@@ -6,11 +6,11 @@ import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
 @Stable
 sealed class CurrentTrackState {
 
-    data object Initial: CurrentTrackState()
+    data object Initial : CurrentTrackState()
 
-    data object NoCurrentTrack: CurrentTrackState()
+    data object NoCurrentTrack : CurrentTrackState()
 
     @Stable
-    class Track(val track: TrackInfoModel, val isPaused: Boolean): CurrentTrackState()
+    class Track(val track: TrackInfoModel, val isPaused: Boolean) : CurrentTrackState()
 
 }

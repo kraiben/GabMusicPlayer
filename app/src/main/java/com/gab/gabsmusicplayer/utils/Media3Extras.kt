@@ -30,7 +30,7 @@ fun MediaController.moveTrackToStartOfQuery(track: TrackInfoModel) {
     val size = this.mediaItemCount
     for (i in 0 until size) {
         if (this.getMediaItemAt(i).mediaId == track.id.toString()) {
-            if ((i == curIndex) || (i == (curIndex+1)%size)) return
+            if ((i == curIndex) || (i == (curIndex + 1) % size)) return
             if (i > curIndex) this.moveMediaItem(i, this.nextMediaItemIndex)
             else this.moveMediaItem(i, curIndex)
             return
@@ -51,6 +51,7 @@ fun TrackInfoModel.toMediaItem(): MediaItem = MediaItem.Builder()
             .setArtworkUri(this.albumArtUri)
             .setArtist(this.artist)
             .setDurationMs(this.duration)
+            .setArtworkData(null, this.albumArtUriIsNullPatchId)
             .build()
     ).setMediaId(this.id.toString())
     .build()

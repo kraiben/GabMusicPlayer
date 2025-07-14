@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-private class Zametka (
+private class Zametka(
     // Primary colors
     primary: Color,          // Основной брендовый цвет
     onPrimary: Color,        // Контент на primary
@@ -106,17 +106,17 @@ private val LightColorScheme = lightColorScheme(
 fun GabsMusicPlayerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         dynamicColor && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,

@@ -4,7 +4,7 @@ import android.app.Application
 import com.gab.gabsmusicplayer.di.ApplicationComponent
 import com.gab.gabsmusicplayer.di.DaggerApplicationComponent
 
-class MusicApplication: Application() {
+class MusicApplication : Application() {
 
     val component: ApplicationComponent by lazy {
         DaggerApplicationComponent.factory().create(this)
