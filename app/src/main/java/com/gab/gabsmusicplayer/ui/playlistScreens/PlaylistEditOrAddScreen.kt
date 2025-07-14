@@ -97,7 +97,7 @@ fun PlaylistEditOrAddScreen(
         title: String,
         coverUri: Uri) -> Unit,
     onCreatePlaylist: (List<TrackInfoModel>, String, Uri) -> Unit,
-    onRemovePlaylist: (PlaylistInfoModel) -> Unit = {},
+    onRemovePlaylist: (PlaylistInfoModel) -> Unit = {}
 ) {
 
     var title by remember { mutableStateOf(playlist.title) }
@@ -170,13 +170,6 @@ fun PlaylistEditOrAddScreen(
         playlistCreationResultFlow.collect {
             if (it) {
                 onReturn()
-            } else {
-                GAB_CHECK("aoeihfg")
-                snackbarHostState.showSnackbar(
-                    message = "Имя плейлиста должно быть уникально",
-                    actionLabel = null,
-                    duration = SnackbarDuration.Short
-                )
             }
         }
     }
@@ -461,7 +454,7 @@ fun PlaylistEditOrAddScreen(
                     )
                     Text(
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
+                            .fillMaxWidth(1f)
                             .fillMaxHeight()
                             .clickable {
                                 onRemovePlaylist(playlist)

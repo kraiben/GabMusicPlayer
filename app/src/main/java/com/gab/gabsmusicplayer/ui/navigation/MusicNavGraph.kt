@@ -17,8 +17,8 @@ fun MusicNavGraph(
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = Screen.Playlist.route
-//        startDestination = Screen.AllTracksScreen.route
+//        startDestination = Screen.Playlist.route
+        startDestination = Screen.AllTracksScreen.route
     ) {
         composable(
             route = Screen.AllTracksScreen.route
