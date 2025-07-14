@@ -58,7 +58,8 @@ fun SinglePlaylistScreen(
     setPlaylistPicture: (PlaylistInfoModel, uri: Uri) -> Unit,
     playlistsState: PlaylistScreenState,
     paddingValues: PaddingValues = PaddingValues(0.dp),
-    playlistEdit: (PlaylistInfoModel) -> Unit
+    playlistEdit: (PlaylistInfoModel) -> Unit,
+    trackOptionsMenuClickListener: (TrackInfoModel, PlaylistInfoModel) -> Unit
 ) {
 
     when (playlistsState) {
@@ -173,7 +174,7 @@ fun SinglePlaylistScreen(
                             .combinedClickable(
                                 onClick = { onTrackClickListener(playlist.tracks, index) }
                             ),
-                        menuButtonClickListener = {}
+                        menuButtonClickListener = {trackOptionsMenuClickListener(track, playlist)}
                     )
                 }
             }

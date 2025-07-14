@@ -18,7 +18,7 @@ data class PlaylistInfoModel(
 
 
 ) {
-    fun toJson() = gson.toJson(this)
+    fun toJson(): String = gson.toJson(this)
     companion object {
         val EMPTY = PlaylistInfoModel(-1, "", emptyList(), Uri.EMPTY, fallbackCover = R.drawable.gpic_megumindk, Date())
 

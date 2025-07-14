@@ -1,6 +1,7 @@
 package com.gab.gabsmusicplayer.ui.screens.main
 
 import android.Manifest
+import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -16,6 +17,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -27,8 +29,10 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -47,6 +51,8 @@ import com.gab.gabsmusicplayer.ui.ViewModelFactory
 import com.gab.gabsmusicplayer.ui.allTracksScreen.AllTracksScreen
 import com.gab.gabsmusicplayer.ui.allTracksScreen.AllTracksScreenState
 import com.gab.gabsmusicplayer.ui.general.MiniPlayer
+import com.gab.gabsmusicplayer.ui.general.tracksList.TrackOptionsMenu
+import com.gab.gabsmusicplayer.ui.general.tracksList.TrackOptionsMenuState
 import com.gab.gabsmusicplayer.ui.musicPlayerScreen.MusicPlayerScreen
 import com.gab.gabsmusicplayer.ui.navigation.MusicNavGraph
 import com.gab.gabsmusicplayer.ui.navigation.NavigationItem
@@ -71,33 +77,43 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
     val navigationState = rememberNavigationState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-    )
-    LaunchedEffect(Unit) { sheetState.hide() }
-    val snackbarHostState = remember { SnackbarHostState() }
-    val navItems = listOf<NavigationItem>(
-        NavigationItem.AllTracks,
-        NavigationItem.AllPlaylists
-    )
-    val navBackStackEntry by navigationState.navHostController
-        .currentBackStackEntryAsState()
     val readExtStoragePermissionState = rememberPermissionState(
         permission =
         if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO
         else Manifest.permission.READ_EXTERNAL_STORAGE
     )
+    GetPermission(readExtStoragePermissionState)
+
+
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val snackbarHostState = remember { SnackbarHostState() }
+    val trackOptionsMenuState: MutableState<TrackOptionsMenuState> =
+        remember { mutableStateOf(TrackOptionsMenuState.NotVisible) }
+
+
+    val navBackStackEntry by navigationState.navHostController
+        .currentBackStackEntryAsState()
+    val destinationFlow = navigationState.navHostController.currentBackStackEntryAsState()
+    val navItems = listOf<NavigationItem>(
+        NavigationItem.AllTracks,
+        NavigationItem.AllPlaylists
+    )
+
     val musicViewModel: MusicViewModel = viewModel(factory = viewModelFactory)
     val playlistsViewModel: PlaylistsViewModel = viewModel(factory = viewModelFactory)
 
     val tracksState = playlistsViewModel.tracks.collectAsState(AllTracksScreenState.Initial)
-    val tracksWithoutDurationFilterState =
-        playlistsViewModel.tracksWithoutDurationFilter.collectAsState()
+    val tracksWithoutDurationFilterState = playlistsViewModel.tracksWithoutDurationFilter
+        .collectAsState(AllTracksScreenState.Initial)
     val playlistsState = playlistsViewModel.playlists.collectAsState(PlaylistScreenState.Initial)
-    val destinationFlow = navigationState.navHostController.currentBackStackEntryAsState()
+    LaunchedEffect(Unit) {
+        playlistsViewModel.playlistCreationOrEditingResultFlow.collect {
+            if (!it) snackbarHostState
+                .showSnackbar(message = "Название плейлиста должно быть уникально")
+        }
+    }
 
-    GetPermission(readExtStoragePermissionState)
 
     if (readExtStoragePermissionState.status.isGranted) {
         ModalNavigationDrawer(
@@ -172,7 +188,11 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                                         playlist, PlaylistChangesScreenMode.EditMode
                                     )
                                 },
-                                paddingValues = paddingValues
+                                paddingValues = paddingValues,
+                                trackOptionsMenuClickListener = { track, playlist ->
+                                    trackOptionsMenuState.value =
+                                        TrackOptionsMenuState.PlaylistScreenMenu(track, playlist)
+                                }
                             )
                         },
                         allPlaylistsGridContent = {
@@ -191,7 +211,7 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                         playlistEditOrAddScreenContent = { playlist, screenMode ->
                             PlaylistEditOrAddScreen(
                                 playlist = playlist,
-                                allTracks = tracksState.value,
+                                allTracks = tracksWithoutDurationFilterState.value,
                                 playlistCreationResultFlow = playlistsViewModel.playlistCreationOrEditingResultFlow,
                                 screenMode = screenMode,
                                 snackbarHostState = snackbarHostState,
@@ -205,8 +225,10 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                                     navigationState.returnFromPlaylistEditOrAddScreen()
                                 },
                                 onRemovePlaylist = { p -> playlistsViewModel.removePlaylist(p) },
-                                onReturnAfterRemoving = { navigationState
-                                    .returnFromPlaylistEditOrAddScreenAfterRemovingPlaylist() }
+                                onReturnAfterRemoving = {
+                                    navigationState
+                                        .returnFromPlaylistEditOrAddScreenAfterRemovingPlaylist()
+                                }
                             )
                         },
                         allTracksScreenContent = {
@@ -230,7 +252,8 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                                 addInOrderOption = { musicViewModel.setNextTrack(it) },
                                 snackbarHostState = snackbarHostState,
                                 trackOptionsMenuClickListener = { track ->
-
+                                    trackOptionsMenuState.value = TrackOptionsMenuState
+                                        .AllTracksScreenMenu(track)
                                 },
                                 tracksState = tracksState.value
                             )
@@ -249,7 +272,33 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                             )
                         }
                     }
+                    TrackOptionsMenu(
+                        onDismiss = { trackOptionsMenuState.value = TrackOptionsMenuState.NotVisible },
+                        modifier = Modifier,
+                        playlistsState = playlistsState.value,
+                        state = trackOptionsMenuState.value,
+                        creatingPlaylistResultFlow = playlistsViewModel.playlistCreationOrEditingResultFlow,
+                        playNext = { t -> musicViewModel.setNextTrack(t) },
+                        createPlaylist = { track, title ->
+                            playlistsViewModel.createPlaylist(
+                                tracks = listOf(track), title = title, coverUri = Uri.EMPTY
+                            )
+                        },
+                        goToAddInPlaylistMenu = { t ->
+                            trackOptionsMenuState.value = TrackOptionsMenuState.AddToPlaylistMenu(t)
+                        },
+                        goToAddInNewPlaylistMenu = { t ->
+                            trackOptionsMenuState.value = TrackOptionsMenuState.AddToNewPlaylistMenu(t)
+                        },
+                        addToPlaylist = { track, playlist ->
+                            playlistsViewModel.addToPlaylist(playlist, track)
+                        },
+                        removeFromPlaylist = { track, playlist ->
+                            playlistsViewModel.removeFromPlaylist(playlist, track)
+                        },
+                    )
                 }
+
             }
         }
     } else {
@@ -295,6 +344,9 @@ fun DrawerContent(
         navItems.forEach { item ->
             val isSelected = isSelectedCheck(item.screen.route)
             ListItem(
+                colors = ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
                 modifier = Modifier
                     .clickable { onItemClick(item.screen.route) }
                     .width((LocalConfiguration.current.screenWidthDp * 0.75).dp)

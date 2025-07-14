@@ -45,15 +45,15 @@ class PlaylistsViewModel @Inject constructor(
 
     val tracks = getTracksUseCaseWithDurationFilter().map {
         AllTracksScreenState.Tracks(it) as AllTracksScreenState
-    }
-        .onStart { emit(AllTracksScreenState.DataIsLoading) }
+    }.onStart { emit(AllTracksScreenState.DataIsLoading) }
 
-    val tracksWithoutDurationFilter = getTracksUseCaseWithoutDurationFilter()
+    val tracksWithoutDurationFilter = getTracksUseCaseWithoutDurationFilter().map {
+        AllTracksScreenState.Tracks(it) as AllTracksScreenState
+    }.onStart { emit(AllTracksScreenState.DataIsLoading) }
 
     val playlists = getPlaylistsUseCase().map {
         PlaylistScreenState.Playlists(it) as PlaylistScreenState
-    }
-        .onStart { emit(PlaylistScreenState.Loading) }
+    }.onStart { emit(PlaylistScreenState.Loading) }
 
     fun addToPlaylist(playlist: PlaylistInfoModel, trackInfoModel: TrackInfoModel) {
         viewModelScope.launch {
