@@ -1,6 +1,5 @@
 package com.gab.gabsmusicplayer.ui.musicPlayerScreen
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,44 +45,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.gab.gabsmusicplayer.R
+import com.gab.gabsmusicplayer.ui.screens.main.MusicViewModel
 import java.util.Locale
 
 @Composable
 fun MusicPlayerScreen(
-    isTrackPlaying: Boolean,
-    currentPosition: Long,
-    title: String,
-    artist: String,
-    duration: Long,
-    imageUri: Uri,
-    isShuffled: Boolean = false,
-    isOneRepeating: Boolean = false,
-    onPreviousButtonClick: () -> Unit,
-    onPlayPauseButtonClick: () -> Unit,
-    onNextButtonClick: () -> Unit,
-    onSliderChange: (Long) -> Unit,
-    onShuffleButtonClick: () -> Unit = {},
-    onRepeatModeButtonClick: () -> Unit = {},
-
+    viewModel: MusicViewModel
     ) {
-
     Column(
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.background)
             .fillMaxSize()
     ) {
         AsyncImage(
+            contentScale = ContentScale.Crop,
             modifier = Modifier
+                .padding(16.dp)
+                .background(shape = RoundedCornerShape(12), color = Color.Transparent)
                 .fillMaxWidth()
                 .aspectRatio(1f), contentDescription = null,
             model = (ImageRequest.Builder(LocalContext.current)
-                .data(imageUri)
-                .error(R.drawable.miku_headphones)
+                .data(viewModel.imageUri)
+                .error(viewModel.artworkData)
+                .memoryCacheKey("${viewModel.imageUri}-${viewModel.artworkData}")
                 .build())
         )
         Text(
-            text = title,
+            text = viewModel.title,
             maxLines = 1,
             fontSize = 28.sp,
             fontWeight = FontWeight.W400,
@@ -94,7 +84,7 @@ fun MusicPlayerScreen(
             modifier = Modifier.size(8.dp)
         )
         Text(
-            text = artist,
+            text = viewModel.artist,
             maxLines = 1,
             fontSize = 12.sp,
             fontWeight = FontWeight.W100,
@@ -108,11 +98,11 @@ fun MusicPlayerScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
-            duration = duration,
+            duration = viewModel.duration,
             onValueChanged = { newPosition ->
-                onSliderChange(newPosition)
+                viewModel.onSliderChange(newPosition)
             },
-            currentPosition = currentPosition
+            currentPosition = viewModel.currentPosition
         )
 
         Row(
@@ -121,31 +111,31 @@ fun MusicPlayerScreen(
                 .wrapContentHeight(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconButton(onClick = { onShuffleButtonClick() }) {
+            IconButton(onClick = { viewModel.shuffleStateChange() }) {
                 Icon(
                     contentDescription = null, imageVector =
-                    if (isShuffled) Icons.Default.ShuffleOn else Icons.Default.Shuffle
+                    if (viewModel.isShuffleModeSet) Icons.Default.ShuffleOn else Icons.Default.Shuffle
                 )
             }
-            IconButton(onClick = { onPreviousButtonClick() }) {
+            IconButton(onClick = { viewModel.previousTrack() }) {
                 Icon(Icons.Default.SkipPrevious, "Previous", modifier = Modifier.size(80.dp))
             }
 
             IconButton(onClick = {
-                onPlayPauseButtonClick()
+                viewModel.playPauseChange()
             }) {
                 Icon(
-                    if (isTrackPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    if (isTrackPlaying) "Pause" else "Play", modifier = Modifier.size(80.dp)
+                    if (viewModel.isTrackPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    if (viewModel.isTrackPlaying) "Pause" else "Play", modifier = Modifier.size(80.dp)
                 )
             }
-            IconButton(onClick = { onNextButtonClick() }) {
+            IconButton(onClick = { viewModel.nextTrack() }) {
                 Icon(Icons.Default.SkipNext, "Next", modifier = Modifier.size(80.dp))
             }
-            IconButton(onClick = { onRepeatModeButtonClick() }) {
+            IconButton(onClick = { viewModel.isRepeatingOneStateChange() }) {
                 Icon(
                     contentDescription = null,
-                    imageVector = if (isOneRepeating) Icons.Default.RepeatOne else Icons.Default.Repeat
+                    imageVector = if (viewModel.isRepeatingOne) Icons.Default.RepeatOne else Icons.Default.Repeat
                 )
             }
         }

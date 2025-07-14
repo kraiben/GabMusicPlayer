@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.gab.gabsmusicplayer.R
 
 @Composable
 fun MiniPlayer(
@@ -37,14 +36,17 @@ fun MiniPlayer(
     title: String,
     artist: String,
     albumArtUri: Uri,
+    artworkData: Int,
     onPreviousButtonClick: () -> Unit,
     onPlayPauseButtonClick: () -> Unit,
-    onNextButtonClick: () -> Unit
+    onNextButtonClick: () -> Unit,
 ) {
     ListItem(
-        modifier = modifier.clip(
-            RoundedCornerShape(16)
-        ).clickable { onClick() },
+        modifier = modifier
+            .clip(
+                RoundedCornerShape(16)
+            )
+            .clickable { onClick() },
         leadingContent = {
             AsyncImage(
                 modifier = Modifier
@@ -52,7 +54,8 @@ fun MiniPlayer(
                     .aspectRatio(1f), contentDescription = null,
                 model = (ImageRequest.Builder(LocalContext.current)
                     .data(albumArtUri)
-                    .error(R.drawable.megumindk)
+                    .error(artworkData)
+                    .memoryCacheKey("$albumArtUri-$artworkData")
                     .build())
             )
         },
@@ -84,7 +87,13 @@ fun MiniPlayer(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = { onPreviousButtonClick() }) {
-                    Icon(Icons.Default.SkipPrevious, "Previous", modifier = Modifier.fillMaxHeight().aspectRatio(1f))
+                    Icon(
+                        Icons.Default.SkipPrevious,
+                        "Previous",
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .aspectRatio(1f)
+                    )
                 }
 
                 IconButton(onClick = {
@@ -92,11 +101,20 @@ fun MiniPlayer(
                 }) {
                     Icon(
                         if (isTrackPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                        if (isTrackPlaying) "Pause" else "Play", modifier = Modifier.fillMaxHeight().aspectRatio(1f)
+                        if (isTrackPlaying) "Pause" else "Play",
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .aspectRatio(1f)
                     )
                 }
                 IconButton(onClick = { onNextButtonClick() }) {
-                    Icon(Icons.Default.SkipNext, "Next", modifier = Modifier.fillMaxHeight().aspectRatio(1f))
+                    Icon(
+                        Icons.Default.SkipNext,
+                        "Next",
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .aspectRatio(1f)
+                    )
                 }
             }
         }
