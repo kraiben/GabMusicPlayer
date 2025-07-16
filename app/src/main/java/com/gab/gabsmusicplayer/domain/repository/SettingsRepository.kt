@@ -1,13 +1,15 @@
 package com.gab.gabsmusicplayer.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface SettingsRepository {
 
-    fun getMinDurationInSeconds(): Flow<Long>
-    suspend fun setMinDurationInSeconds(duration: Long)
+    fun getMinDurationInSeconds(): StateFlow<Long>
+    suspend fun incrementMinDuration()
+    suspend fun decrementMinDuration()
 
-    fun isThemeDark(): Flow<Boolean>
+    fun isThemeDark(): StateFlow<Boolean>
     suspend fun isDarkThemeChange()
 
 }

@@ -6,24 +6,18 @@ import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -36,10 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,11 +50,12 @@ import com.gab.gabsmusicplayer.ui.navigation.NavigationItem
 import com.gab.gabsmusicplayer.ui.navigation.Screen
 import com.gab.gabsmusicplayer.ui.navigation.rememberNavigationState
 import com.gab.gabsmusicplayer.ui.playlistScreens.AllPlaylistsScreen
+import com.gab.gabsmusicplayer.ui.playlistScreens.MainViewModel
 import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistChangesScreenMode
 import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistEditOrAddScreen
 import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistScreenState
-import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistsViewModel
 import com.gab.gabsmusicplayer.ui.playlistScreens.SinglePlaylistScreen
+import com.gab.gabsmusicplayer.ui.theme.GabsMusicPlayerTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
@@ -84,7 +76,6 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
     )
     GetPermission(readExtStoragePermissionState)
 
-
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val snackbarHostState = remember { SnackbarHostState() }
@@ -101,216 +92,237 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
     )
 
     val musicViewModel: MusicViewModel = viewModel(factory = viewModelFactory)
-    val playlistsViewModel: PlaylistsViewModel = viewModel(factory = viewModelFactory)
+    val mainViewModel: MainViewModel = viewModel(factory = viewModelFactory)
 
-    val tracksState = playlistsViewModel.tracks.collectAsState(AllTracksScreenState.Initial)
-    val tracksWithoutDurationFilterState = playlistsViewModel.tracksWithoutDurationFilter
+    val tracksState = mainViewModel.tracks.collectAsState(AllTracksScreenState.Initial)
+    val tracksWithoutDurationFilterState = mainViewModel.tracksWithoutDurationFilter
         .collectAsState(AllTracksScreenState.Initial)
-    val playlistsState = playlistsViewModel.playlists.collectAsState(PlaylistScreenState.Initial)
+    val playlistsState = mainViewModel.playlists.collectAsState(PlaylistScreenState.Initial)
+    val minDurationValueState = mainViewModel.getMinDurationFlow().collectAsState(94L)
+    val isThemeDarkState = mainViewModel.isThemeDark.collectAsState()
     LaunchedEffect(Unit) {
-        playlistsViewModel.playlistCreationOrEditingResultFlow.collect {
+        mainViewModel.playlistCreationOrEditingResultFlow.collect {
             if (!it) snackbarHostState
                 .showSnackbar(message = "Название плейлиста должно быть уникально")
         }
     }
 
-
-    if (readExtStoragePermissionState.status.isGranted) {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                DrawerContent(
-                    navItems = navItems,
-                    onItemClick = { screenRoute ->
-                        navigationState.navigateTo(screenRoute)
-                        scope.launch { drawerState.close() }
-                    },
-                    isSelectedCheck = { screenRoute ->
-                        navBackStackEntry?.destination?.hierarchy?.any {
-                            it.route == screenRoute
-                        } ?: false
-                    }
-                )
-            }
+    GabsMusicPlayerTheme(darkTheme = isThemeDarkState.value) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            Scaffold(
-                snackbarHost = { SnackbarHost(snackbarHostState) },
-                bottomBar = {
-                    if ((musicViewModel.title != "null")
-                        && (musicViewModel.imageUri.toString() != "") && (destinationFlow.value?.destination?.route != Screen.PlaylistEditOrAddScreen.route)
-                    ) {
-                        MiniPlayer(
-                            modifier = Modifier
-                                .height(52.dp),
-                            onClick = { scope.launch { sheetState.show() } },
-                            isTrackPlaying = musicViewModel.isTrackPlaying,
-                            title = musicViewModel.title,
-                            artist = musicViewModel.artist,
-                            albumArtUri = musicViewModel.imageUri,
-                            artworkData = musicViewModel.artworkData,
-                            onPreviousButtonClick = { musicViewModel.previousTrack() },
-                            onPlayPauseButtonClick = { musicViewModel.playPauseChange() },
-                            onNextButtonClick = { musicViewModel.nextTrack() }
+            if (readExtStoragePermissionState.status.isGranted) {
+                ModalNavigationDrawer(
+                    drawerState = drawerState,
+                    drawerContent = {
+                        DrawerContent(
+                            navItems = navItems,
+                            onItemClick = { screenRoute ->
+                                navigationState.navigateTo(screenRoute)
+                                scope.launch { drawerState.close() }
+                            },
+                            isSelectedCheck = { screenRoute ->
+                                navBackStackEntry?.destination?.hierarchy?.any {
+                                    it.route == screenRoute
+                                } ?: false
+                            },
+                            minDuration = minDurationValueState.value,
+                            incrementMinDuration = { mainViewModel.incrementMinDuration() },
+                            decrementMinDuration = { mainViewModel.decrementMinDuration() },
+                            isThemeDark = isThemeDarkState.value,
+                            isThemeDarkChange = {mainViewModel.isDarkThemeChange()}
                         )
                     }
-                },
-            ) { paddingValues ->
-                Box {
-                    MusicNavGraph(
-                        navHostController = navigationState.navHostController,
-                        playlistScreenContent = { playlistId ->
-                            SinglePlaylistScreen(
-                                playlistId,
-                                onTrackClickListener = { tracks, startIndex ->
-                                    musicViewModel.selectTrack(
-                                        tracks = tracks,
-                                        startIndex = startIndex,
-                                        context = context,
-                                        navigateToPlayer = { scope.launch { sheetState.show() } }
+                ) {
+                    Scaffold(
+                        snackbarHost = { SnackbarHost(snackbarHostState) },
+                        bottomBar = {
+                            if ((musicViewModel.title != "null")
+                                && (musicViewModel.imageUri.toString() != "") && (destinationFlow.value?.destination?.route != Screen.PlaylistEditOrAddScreen.route)
+                            ) {
+                                MiniPlayer(
+                                    modifier = Modifier
+                                        .height(52.dp),
+                                    onClick = { scope.launch { sheetState.show() } },
+                                    isTrackPlaying = musicViewModel.isTrackPlaying,
+                                    title = musicViewModel.title,
+                                    artist = musicViewModel.artist,
+                                    albumArtUri = musicViewModel.imageUri,
+                                    artworkData = musicViewModel.artworkData,
+                                    onPreviousButtonClick = { musicViewModel.previousTrack() },
+                                    onPlayPauseButtonClick = { musicViewModel.playPauseChange() },
+                                    onNextButtonClick = { musicViewModel.nextTrack() }
+                                )
+                            }
+                        },
+                    ) { paddingValues ->
+                        Box {
+                            MusicNavGraph(
+                                navHostController = navigationState.navHostController,
+                                playlistScreenContent = { playlistId ->
+                                    SinglePlaylistScreen(
+                                        playlistId,
+                                        onTrackClickListener = { tracks, startIndex ->
+                                            musicViewModel.selectTrack(
+                                                tracks = tracks,
+                                                startIndex = startIndex,
+                                                context = context,
+                                                navigateToPlayer = { scope.launch { sheetState.show() } }
+                                            )
+                                        },
+                                        onMainPlayButtonClickListener = { tracks ->
+                                            musicViewModel.selectTrack(
+                                                tracks = tracks,
+                                                context = context,
+                                                navigateToPlayer = { scope.launch { sheetState.show() } }
+                                            )
+                                        },
+                                        playlistsState = playlistsState.value,
+                                        setPlaylistPicture = { playlist, uri ->
+                                            mainViewModel.setPlaylistPicture(
+                                                playlist = playlist,
+                                                uri = uri
+                                            )
+                                        },
+                                        playlistEdit = { playlist ->
+                                            navigationState.navigateToPlaylistEditScreen(
+                                                playlist, PlaylistChangesScreenMode.EditMode
+                                            )
+                                        },
+                                        paddingValues = paddingValues,
+                                        trackOptionsMenuClickListener = { track, playlist ->
+                                            trackOptionsMenuState.value =
+                                                TrackOptionsMenuState.PlaylistScreenMenu(
+                                                    track,
+                                                    playlist
+                                                )
+                                        }
                                     )
                                 },
-                                onMainPlayButtonClickListener = { tracks ->
-                                    musicViewModel.selectTrack(
-                                        tracks = tracks,
-                                        context = context,
-                                        navigateToPlayer = { scope.launch { sheetState.show() } }
+                                allPlaylistsGridContent = {
+                                    AllPlaylistsScreen(
+                                        paddingValues = paddingValues,
+                                        navigationState = navigationState,
+                                        playlistsState = playlistsState.value,
+                                        onCreateNewPlaylist = {
+                                            navigationState.navigateToPlaylistEditScreen(
+                                                PlaylistInfoModel.EMPTY,
+                                                PlaylistChangesScreenMode.CreatingMode
+                                            )
+                                        }
                                     )
                                 },
-                                playlistsState = playlistsState.value,
-                                setPlaylistPicture = { playlist, uri ->
-                                    playlistsViewModel.setPlaylistPicture(
+                                playlistEditOrAddScreenContent = { playlist, screenMode ->
+                                    PlaylistEditOrAddScreen(
                                         playlist = playlist,
-                                        uri = uri
+                                        allTracks = tracksWithoutDurationFilterState.value,
+                                        playlistCreationResultFlow = mainViewModel.playlistCreationOrEditingResultFlow,
+                                        screenMode = screenMode,
+                                        snackbarHostState = snackbarHostState,
+                                        onCreatePlaylist = { tracks, title, coverUri ->
+                                            mainViewModel.createPlaylist(tracks, title, coverUri)
+                                        },
+                                        onSavePlaylistChanges = { pId, tracks, title, coverUri ->
+                                            mainViewModel.changePlaylist(pId, tracks, title, coverUri)
+                                        },
+                                        onReturn = {
+                                            navigationState.returnFromPlaylistEditOrAddScreen()
+                                        },
+                                        onRemovePlaylist = { p -> mainViewModel.removePlaylist(p) },
+                                        onReturnAfterRemoving = {
+                                            navigationState
+                                                .returnFromPlaylistEditOrAddScreenAfterRemovingPlaylist()
+                                        }
                                     )
                                 },
-                                playlistEdit = { playlist ->
-                                    navigationState.navigateToPlaylistEditScreen(
-                                        playlist, PlaylistChangesScreenMode.EditMode
+                                allTracksScreenContent = {
+                                    AllTracksScreen(
+                                        onStartRandomButtonClickListener = { tracks ->
+                                            musicViewModel.selectTrack(
+                                                tracks = tracks, isShuffled = true, context = context,
+                                                navigateToPlayer = { scope.launch { sheetState.show() } }
+                                            )
+                                        },
+                                        onTrackClickListener = { p1, p2 ->
+                                            musicViewModel.selectTrack(
+                                                tracks = p1,
+                                                startIndex = p2,
+                                                context = context,
+                                                navigateToPlayer = { scope.launch { sheetState.show() } }
+                                            )
+                                        },
+                                        padding = paddingValues,
+                                        menuButtonClickListener = { scope.launch { drawerState.open() } },
+                                        addInOrderOption = { musicViewModel.setNextTrack(it) },
+                                        snackbarHostState = snackbarHostState,
+                                        trackOptionsMenuClickListener = { track ->
+                                            trackOptionsMenuState.value = TrackOptionsMenuState
+                                                .AllTracksScreenMenu(track)
+                                        },
+                                        tracksState = tracksState.value
                                     )
-                                },
-                                paddingValues = paddingValues,
-                                trackOptionsMenuClickListener = { track, playlist ->
-                                    trackOptionsMenuState.value =
-                                        TrackOptionsMenuState.PlaylistScreenMenu(track, playlist)
                                 }
                             )
-                        },
-                        allPlaylistsGridContent = {
-                            AllPlaylistsScreen(
-                                paddingValues = paddingValues,
-                                navigationState = navigationState,
+                            AnimatedVisibility(
+                                sheetState.isVisible
+                            ) {
+                                ModalBottomSheet(
+                                    dragHandle = {},
+                                    sheetState = sheetState,
+                                    onDismissRequest = { scope.launch { sheetState.hide() } }
+                                ) {
+                                    MusicPlayerScreen(
+                                        viewModel = musicViewModel,
+                                    )
+                                }
+                            }
+                            TrackOptionsMenu(
+                                onDismiss = {
+                                    trackOptionsMenuState.value = TrackOptionsMenuState.NotVisible
+                                },
+                                modifier = Modifier,
                                 playlistsState = playlistsState.value,
-                                onCreateNewPlaylist = {
-                                    navigationState.navigateToPlaylistEditScreen(
-                                        PlaylistInfoModel.EMPTY,
-                                        PlaylistChangesScreenMode.CreatingMode
-                                    )
-                                }
-                            )
-                        },
-                        playlistEditOrAddScreenContent = { playlist, screenMode ->
-                            PlaylistEditOrAddScreen(
-                                playlist = playlist,
-                                allTracks = tracksWithoutDurationFilterState.value,
-                                playlistCreationResultFlow = playlistsViewModel.playlistCreationOrEditingResultFlow,
-                                screenMode = screenMode,
-                                snackbarHostState = snackbarHostState,
-                                onCreatePlaylist = { tracks, title, coverUri ->
-                                    playlistsViewModel.createPlaylist(tracks, title, coverUri)
-                                },
-                                onSavePlaylistChanges = { pId, tracks, title, coverUri ->
-                                    playlistsViewModel.changePlaylist(pId, tracks, title, coverUri)
-                                },
-                                onReturn = {
-                                    navigationState.returnFromPlaylistEditOrAddScreen()
-                                },
-                                onRemovePlaylist = { p -> playlistsViewModel.removePlaylist(p) },
-                                onReturnAfterRemoving = {
-                                    navigationState
-                                        .returnFromPlaylistEditOrAddScreenAfterRemovingPlaylist()
-                                }
-                            )
-                        },
-                        allTracksScreenContent = {
-                            AllTracksScreen(
-                                onStartRandomButtonClickListener = { tracks ->
-                                    musicViewModel.selectTrack(
-                                        tracks = tracks, isShuffled = true, context = context,
-                                        navigateToPlayer = { scope.launch { sheetState.show() } }
+                                state = trackOptionsMenuState.value,
+                                creatingPlaylistResultFlow = mainViewModel.playlistCreationOrEditingResultFlow,
+                                playNext = { t -> musicViewModel.setNextTrack(t) },
+                                createPlaylist = { track, title ->
+                                    mainViewModel.createPlaylist(
+                                        tracks = listOf(track), title = title, coverUri = Uri.EMPTY
                                     )
                                 },
-                                onTrackClickListener = { p1, p2 ->
-                                    musicViewModel.selectTrack(
-                                        tracks = p1,
-                                        startIndex = p2,
-                                        context = context,
-                                        navigateToPlayer = { scope.launch { sheetState.show() } }
-                                    )
+                                goToAddInPlaylistMenu = { t ->
+                                    trackOptionsMenuState.value =
+                                        TrackOptionsMenuState.AddToPlaylistMenu(t)
                                 },
-                                padding = paddingValues,
-                                menuButtonClickListener = { scope.launch { drawerState.open() } },
-                                addInOrderOption = { musicViewModel.setNextTrack(it) },
-                                snackbarHostState = snackbarHostState,
-                                trackOptionsMenuClickListener = { track ->
-                                    trackOptionsMenuState.value = TrackOptionsMenuState
-                                        .AllTracksScreenMenu(track)
+                                goToAddInNewPlaylistMenu = { t ->
+                                    trackOptionsMenuState.value =
+                                        TrackOptionsMenuState.AddToNewPlaylistMenu(t)
                                 },
-                                tracksState = tracksState.value
+                                addToPlaylist = { track, playlist ->
+                                    mainViewModel.addToPlaylist(playlist, track)
+                                },
+                                removeFromPlaylist = { track, playlist ->
+                                    mainViewModel.removeFromPlaylist(playlist, track)
+                                },
                             )
                         }
-                    )
-                    AnimatedVisibility(
-                        sheetState.isVisible
-                    ) {
-                        ModalBottomSheet(
-                            dragHandle = {},
-                            sheetState = sheetState,
-                            onDismissRequest = { scope.launch { sheetState.hide() } }
-                        ) {
-                            MusicPlayerScreen(
-                                viewModel = musicViewModel,
-                            )
-                        }
+
                     }
-                    TrackOptionsMenu(
-                        onDismiss = { trackOptionsMenuState.value = TrackOptionsMenuState.NotVisible },
-                        modifier = Modifier,
-                        playlistsState = playlistsState.value,
-                        state = trackOptionsMenuState.value,
-                        creatingPlaylistResultFlow = playlistsViewModel.playlistCreationOrEditingResultFlow,
-                        playNext = { t -> musicViewModel.setNextTrack(t) },
-                        createPlaylist = { track, title ->
-                            playlistsViewModel.createPlaylist(
-                                tracks = listOf(track), title = title, coverUri = Uri.EMPTY
-                            )
-                        },
-                        goToAddInPlaylistMenu = { t ->
-                            trackOptionsMenuState.value = TrackOptionsMenuState.AddToPlaylistMenu(t)
-                        },
-                        goToAddInNewPlaylistMenu = { t ->
-                            trackOptionsMenuState.value = TrackOptionsMenuState.AddToNewPlaylistMenu(t)
-                        },
-                        addToPlaylist = { track, playlist ->
-                            playlistsViewModel.addToPlaylist(playlist, track)
-                        },
-                        removeFromPlaylist = { track, playlist ->
-                            playlistsViewModel.removeFromPlaylist(playlist, track)
-                        },
-                    )
                 }
+            } else {
+                Text(
+                    text = "Request Perms",
+                    fontSize = 40.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(onClick = { readExtStoragePermissionState.launchPermissionRequest() })
+                )
 
             }
         }
-    } else {
-        Text(
-            text = "Request Perms",
-            fontSize = 40.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(onClick = { readExtStoragePermissionState.launchPermissionRequest() })
-        )
-
     }
 }
 
@@ -326,46 +338,6 @@ fun GetPermission(permission: PermissionState) {
             }
 
             PermissionStatus.Granted -> {}
-        }
-    }
-}
-
-@Composable
-fun DrawerContent(
-    onItemClick: (String) -> Unit,
-    navItems: List<NavigationItem>,
-    isSelectedCheck: (String) -> Boolean,
-) {
-    Column(
-        modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.background)
-            .fillMaxHeight(), verticalArrangement = Arrangement.Center
-    ) {
-        navItems.forEach { item ->
-            val isSelected = isSelectedCheck(item.screen.route)
-            ListItem(
-                colors = ListItemDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                modifier = Modifier
-                    .clickable { onItemClick(item.screen.route) }
-                    .width((LocalConfiguration.current.screenWidthDp * 0.75).dp)
-                    .height(48.dp),
-                leadingContent = {
-                    Icon(
-                        contentDescription = null,
-                        imageVector = item.icon
-                    )
-                },
-                headlineContent = {
-                    Text(
-                        text = stringResource(item.titleResId),
-                        fontWeight = FontWeight.W300,
-                        fontSize = 24.sp
-                    )
-                }
-            )
-
         }
     }
 }
