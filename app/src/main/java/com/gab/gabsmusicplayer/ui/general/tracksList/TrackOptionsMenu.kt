@@ -117,7 +117,10 @@ fun TrackOptionsMenu(
                             playlistsState.playlists
                         } else emptyList()
                         playlists.forEach { p ->
-                            OptionsMenuElement(p.title) { addToPlaylist(state.track, p) }
+                            OptionsMenuElement(p.title) {
+                                addToPlaylist(state.track, p)
+                                onDismiss()
+                            }
                         }
                         OptionsMenuElement("Создать новый") { goToAddInNewPlaylistMenu(state.track) }
                     }
@@ -163,6 +166,7 @@ fun OptionsMenuElement(text: String, action: () -> Unit) {
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
         modifier = Modifier
+            .fillMaxWidth()
             .clickable(onClick = action)
             .wrapContentHeight(align = Alignment.CenterVertically)
             .padding(8.dp),

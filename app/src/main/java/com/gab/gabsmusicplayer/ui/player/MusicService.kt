@@ -52,6 +52,7 @@ class MusicService : MediaSessionService() {
                         if (keyEvent?.action == KeyEvent.ACTION_DOWN && keyEvent.keyCode == KeyEvent.KEYCODE_HEADSETHOOK) {
                             clickCount++
                             handler.removeCallbacksAndMessages(null)
+
                             fun handleSingleClick() {
                                 if (player.isPlaying) {
                                     player.pause()

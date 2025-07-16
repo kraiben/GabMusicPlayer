@@ -68,7 +68,6 @@ class MusicLoadingRepositoryImpl @Inject constructor(
     private val tracksLoadingFlow: Flow<List<TrackInfoModel>> = flow {
         tracksFlowNeedUpdate.emit(Unit)
         tracksFlowNeedUpdate.collect {
-            GAB_CHECK("tracksFlowNeedUpdate changed. Thread: ${Thread.currentThread().name}")
             _tracks.clear()
             _tracks.addAll(loadMusicFiles())
             emit(tracks)
@@ -88,13 +87,13 @@ class MusicLoadingRepositoryImpl @Inject constructor(
 //        ps2.forEach {
 //            it.delete()
 //        }
-
-        ps1.forEach {
-            GAB_CHECK(it)
-        }
-        ps2.forEach {
-            GAB_CHECK(it)
-        }
+//
+//        ps1.forEach {
+//            GAB_CHECK(it)
+//        }
+//        ps2.forEach {
+//            GAB_CHECK(it)
+//        }
 
     }
 

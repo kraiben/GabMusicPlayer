@@ -1,7 +1,7 @@
 package com.gab.gabsmusicplayer.di
 
 import androidx.lifecycle.ViewModel
-import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistsViewModel
+import com.gab.gabsmusicplayer.ui.playlistScreens.MainViewModel
 import com.gab.gabsmusicplayer.ui.screens.main.MusicViewModel
 import dagger.Binds
 import dagger.Module
@@ -17,7 +17,7 @@ interface ViewModelModule {
     fun bindMainViewModel(viewModel: MusicViewModel): ViewModel
 
     @IntoMap
-    @ViewModelKey(PlaylistsViewModel::class)
+    @ViewModelKey(MainViewModel::class)
     @Binds
-    fun bindPlaylistsViewModel(viewModel: PlaylistsViewModel): ViewModel
+    fun bindPlaylistsViewModel(viewModel: MainViewModel): ViewModel
 }
