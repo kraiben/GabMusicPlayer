@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -35,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -50,20 +53,24 @@ import java.util.Locale
 
 @Composable
 fun MusicPlayerScreen(
-    viewModel: MusicViewModel
-    ) {
+    viewModel: MusicViewModel,
+) {
     Column(
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.background)
             .fillMaxSize()
+            .padding(horizontal = 12.dp)
+            .statusBarsPadding()
+            .navigationBarsPadding()
     ) {
+        Spacer(modifier = Modifier.height(50.dp))
         AsyncImage(
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .padding(16.dp)
-                .background(shape = RoundedCornerShape(12), color = Color.Transparent)
+                .clip(shape = RoundedCornerShape(16))
                 .fillMaxWidth()
-                .aspectRatio(1f), contentDescription = null,
+                .aspectRatio(1f),
+            contentDescription = null,
             model = (ImageRequest.Builder(LocalContext.current)
                 .data(viewModel.imageUri)
                 .error(viewModel.artworkData)
@@ -71,6 +78,7 @@ fun MusicPlayerScreen(
                 .build())
         )
         Text(
+            color = MaterialTheme.colorScheme.onBackground,
             text = viewModel.title,
             maxLines = 1,
             fontSize = 28.sp,
@@ -78,10 +86,7 @@ fun MusicPlayerScreen(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .wrapContentHeight()
-                .padding(horizontal = 12.dp)
-        )
-        Spacer(
-            modifier = Modifier.size(8.dp)
+                .padding(top = 24.dp, bottom = 8.dp)
         )
         Text(
             text = viewModel.artist,
@@ -90,12 +95,13 @@ fun MusicPlayerScreen(
             fontWeight = FontWeight.W100,
             modifier = Modifier
                 .wrapContentHeight()
-                .padding(horizontal = 12.dp),
+                .padding(bottom = 24.dp),
             overflow = TextOverflow.Ellipsis
         )
 
         MediaPlayerSlider(
             modifier = Modifier
+                .padding(8.dp)
                 .fillMaxWidth()
                 .wrapContentHeight(),
             duration = viewModel.duration,
@@ -113,12 +119,19 @@ fun MusicPlayerScreen(
         ) {
             IconButton(onClick = { viewModel.shuffleStateChange() }) {
                 Icon(
-                    contentDescription = null, imageVector =
-                    if (viewModel.isShuffleModeSet) Icons.Default.ShuffleOn else Icons.Default.Shuffle
+                    contentDescription = null,
+                    imageVector =
+                    if (viewModel.isShuffleModeSet) Icons.Default.ShuffleOn else Icons.Default.Shuffle,
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
             IconButton(onClick = { viewModel.previousTrack() }) {
-                Icon(Icons.Default.SkipPrevious, "Previous", modifier = Modifier.size(80.dp))
+                Icon(
+                    Icons.Default.SkipPrevious,
+                    "Previous",
+                    modifier = Modifier.size(80.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             }
 
             IconButton(onClick = {
@@ -126,16 +139,24 @@ fun MusicPlayerScreen(
             }) {
                 Icon(
                     if (viewModel.isTrackPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    if (viewModel.isTrackPlaying) "Pause" else "Play", modifier = Modifier.size(80.dp)
+                    if (viewModel.isTrackPlaying) "Pause" else "Play",
+                    modifier = Modifier.size(80.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
             IconButton(onClick = { viewModel.nextTrack() }) {
-                Icon(Icons.Default.SkipNext, "Next", modifier = Modifier.size(80.dp))
+                Icon(
+                    Icons.Default.SkipNext,
+                    "Next",
+                    modifier = Modifier.size(80.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             }
             IconButton(onClick = { viewModel.isRepeatingOneStateChange() }) {
                 Icon(
                     contentDescription = null,
-                    imageVector = if (viewModel.isRepeatingOne) Icons.Default.RepeatOne else Icons.Default.Repeat
+                    imageVector = if (viewModel.isRepeatingOne) Icons.Default.RepeatOne else Icons.Default.Repeat,
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
@@ -203,12 +224,14 @@ fun MediaPlayerSlider(
             Text(
                 text = formatTime(currentPosition),
                 fontSize = 12.sp,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 fontSize = 12.sp,
                 text = formatTime(duration),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }

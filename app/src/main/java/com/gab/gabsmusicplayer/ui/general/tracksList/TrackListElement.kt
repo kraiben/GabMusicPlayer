@@ -68,6 +68,7 @@ fun TrackListElement(
         },
         trailingContent = {
             Icon(
+                tint = MaterialTheme.colorScheme.onBackground,
                 contentDescription = null,
                 imageVector = Icons.Default.MoreVert,
                 modifier = Modifier
@@ -80,6 +81,4 @@ fun TrackListElement(
         }
 
     )
-
-
 }

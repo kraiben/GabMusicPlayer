@@ -38,7 +38,8 @@ fun SortChip(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         },
         colors = InputChipDefaults.inputChipColors(

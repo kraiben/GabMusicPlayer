@@ -64,7 +64,7 @@ fun AllPlaylistsScreen(
                         modifier = Modifier
                             .clickable { navigationState.navigateToPlaylist(playlist.id) }
                             .padding(horizontal = 4.dp)
-                            .background(color = MaterialTheme.colorScheme.surface)
+                            .background(color = MaterialTheme.colorScheme.background)
                             .aspectRatio(0.75F)
                             .fillMaxWidth()
                     ) {
@@ -83,9 +83,11 @@ fun AllPlaylistsScreen(
                         Text(
                             text = playlist.title,
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.W200,
+                            fontWeight = FontWeight.W400,
                             overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
+                            maxLines = 1,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(vertical = 8.dp)
                         )
                     }
                 }
@@ -95,7 +97,7 @@ fun AllPlaylistsScreen(
                         modifier = Modifier
                             .clickable { onCreateNewPlaylist() }
                             .padding(horizontal = 4.dp)
-                            .background(color = MaterialTheme.colorScheme.surface)
+                            .background(color = MaterialTheme.colorScheme.background)
                             .aspectRatio(0.75F)
                             .fillMaxWidth()
                     ) {
@@ -119,7 +121,8 @@ fun AllPlaylistsScreen(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.W200,
                             overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
+                            maxLines = 1,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
