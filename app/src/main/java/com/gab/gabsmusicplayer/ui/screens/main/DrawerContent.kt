@@ -52,14 +52,14 @@ fun DrawerContent(
         modifier = Modifier
             .padding(end = 16.dp)
             .fillMaxWidth(0.75f)
-            .background(color = MaterialTheme.colorScheme.background)
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
             .fillMaxHeight(), verticalArrangement = Arrangement.Center
     ) {
         navItems.forEach { item ->
             val isSelected = isSelectedCheck(item.screen.route)
             ListItem(
                 colors = ListItemDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
                 ),
                 modifier = Modifier
                     .clickable { onItemClick(item.screen.route) }
@@ -67,6 +67,7 @@ fun DrawerContent(
                     .height(48.dp),
                 leadingContent = {
                     Icon(
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         contentDescription = null,
                         imageVector = item.icon
                     )
@@ -74,8 +75,9 @@ fun DrawerContent(
                 headlineContent = {
                     Text(
                         text = stringResource(item.titleResId),
-                        fontWeight = FontWeight.W300,
-                        fontSize = 24.sp
+                        fontWeight = FontWeight.W500,
+                        fontSize = 24.sp,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             )
@@ -91,7 +93,7 @@ fun DrawerContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .background(color = MaterialTheme.colorScheme.onPrimaryContainer),
+                .background(color = MaterialTheme.colorScheme.primaryContainer),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -99,7 +101,8 @@ fun DrawerContent(
                     .padding(start = 16.dp, end = 8.dp)
                     .fillMaxWidth(0.5f),
                 text = "Длительность:",
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.W400,
             )
             Icon(
                 imageVector = Icons.Outlined.RemoveCircleOutline,
@@ -107,17 +110,17 @@ fun DrawerContent(
                 modifier = Modifier
                     .clickable { decrementMinDuration() }
                     .size(30.dp),
-                tint = MaterialTheme.colorScheme.onBackground
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(modifier = Modifier.padding(horizontal = 16.dp), text = duration,
-                    color = MaterialTheme.colorScheme.onBackground,)
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,)
             Icon(
                 imageVector = Icons.Outlined.AddCircleOutline,
                 contentDescription = null,
                 modifier = Modifier
                     .clickable { incrementMinDuration() }
                     .size(30.dp),
-                tint = MaterialTheme.colorScheme.onBackground
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
         HorizontalDivider(
@@ -129,7 +132,7 @@ fun DrawerContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .background(color = MaterialTheme.colorScheme.onPrimaryContainer),
+                .background(color = MaterialTheme.colorScheme.primaryContainer),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -137,8 +140,9 @@ fun DrawerContent(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 8.dp)
                     .fillMaxWidth(0.5f),
-                color = MaterialTheme.colorScheme.onBackground,
-                text = "Темный режим"
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                text = "Темный режим",
+                fontWeight = FontWeight.W400
             )
             Switch(
                 isThemeDark,

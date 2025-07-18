@@ -3,12 +3,17 @@ package com.gab.gabsmusicplayer.ui.screens.main
 import android.Manifest
 import android.net.Uri
 import android.os.Build
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -63,7 +69,9 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class
+)
 @Composable
 fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
     val navigationState = rememberNavigationState()
@@ -108,10 +116,20 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
     }
 
     GabsMusicPlayerTheme(darkTheme = isThemeDarkState.value) {
+        (context as? ComponentActivity)?.enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(
+                MaterialTheme.colorScheme.primaryContainer.toArgb()
+            ),
+            navigationBarStyle = SystemBarStyle.dark(
+                MaterialTheme.colorScheme.primaryContainer.toArgb()
+            )
+        )
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .statusBarsPadding()
+                .navigationBarsPadding()
         ) {
             if (readExtStoragePermissionState.status.isGranted) {
                 ModalNavigationDrawer(
@@ -132,7 +150,7 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                             incrementMinDuration = { mainViewModel.incrementMinDuration() },
                             decrementMinDuration = { mainViewModel.decrementMinDuration() },
                             isThemeDark = isThemeDarkState.value,
-                            isThemeDarkChange = {mainViewModel.isDarkThemeChange()}
+                            isThemeDarkChange = { mainViewModel.isDarkThemeChange() }
                         )
                     }
                 ) {
@@ -225,7 +243,12 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                                             mainViewModel.createPlaylist(tracks, title, coverUri)
                                         },
                                         onSavePlaylistChanges = { pId, tracks, title, coverUri ->
-                                            mainViewModel.changePlaylist(pId, tracks, title, coverUri)
+                                            mainViewModel.changePlaylist(
+                                                pId,
+                                                tracks,
+                                                title,
+                                                coverUri
+                                            )
                                         },
                                         onReturn = {
                                             navigationState.returnFromPlaylistEditOrAddScreen()
@@ -241,7 +264,9 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                                     AllTracksScreen(
                                         onStartRandomButtonClickListener = { tracks ->
                                             musicViewModel.selectTrack(
-                                                tracks = tracks, isShuffled = true, context = context,
+                                                tracks = tracks,
+                                                isShuffled = true,
+                                                context = context,
                                                 navigateToPlayer = { scope.launch { sheetState.show() } }
                                             )
                                         },

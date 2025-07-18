@@ -60,7 +60,7 @@ fun AllTracksScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .height(44.dp)
+                            .height(56.dp)
                             .clickable { onStartRandomButtonClickListener(tracksState.tracks) }) {
                         Icon(
                             modifier = Modifier

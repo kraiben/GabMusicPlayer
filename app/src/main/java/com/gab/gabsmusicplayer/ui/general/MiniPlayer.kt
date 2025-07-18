@@ -22,7 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
@@ -44,11 +44,12 @@ fun MiniPlayer(
     ListItem(
         modifier = modifier
             .clip(
-                RoundedCornerShape(16)
+                RoundedCornerShape(topEnd = 16f, topStart = 16f)
             )
             .clickable { onClick() },
         leadingContent = {
             AsyncImage(
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxHeight()
                     .aspectRatio(1f), contentDescription = null,
@@ -60,7 +61,7 @@ fun MiniPlayer(
             )
         },
         colors = ListItemDefaults.colors(
-            containerColor = Color.Gray
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         headlineContent = {
             Text(
@@ -88,11 +89,13 @@ fun MiniPlayer(
             ) {
                 IconButton(onClick = { onPreviousButtonClick() }) {
                     Icon(
+
                         Icons.Default.SkipPrevious,
                         "Previous",
                         modifier = Modifier
                             .fillMaxHeight()
                             .aspectRatio(1f)
+                        , tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
 
@@ -100,20 +103,24 @@ fun MiniPlayer(
                     onPlayPauseButtonClick()
                 }) {
                     Icon(
+
                         if (isTrackPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                         if (isTrackPlaying) "Pause" else "Play",
                         modifier = Modifier
                             .fillMaxHeight()
                             .aspectRatio(1f)
+                        , tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 IconButton(onClick = { onNextButtonClick() }) {
                     Icon(
+
                         Icons.Default.SkipNext,
                         "Next",
                         modifier = Modifier
                             .fillMaxHeight()
                             .aspectRatio(1f)
+                        , tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
             }

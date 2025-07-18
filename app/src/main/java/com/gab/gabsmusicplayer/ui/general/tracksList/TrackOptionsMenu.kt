@@ -170,7 +170,7 @@ fun OptionsMenuElement(text: String, action: () -> Unit) {
             .clickable(onClick = action)
             .wrapContentHeight(align = Alignment.CenterVertically)
             .padding(8.dp),
-        color = Color.Black,
+        color = MaterialTheme.colorScheme.onPrimaryContainer,
         text = text,
         fontSize = 24.sp,
         fontWeight = FontWeight.W400

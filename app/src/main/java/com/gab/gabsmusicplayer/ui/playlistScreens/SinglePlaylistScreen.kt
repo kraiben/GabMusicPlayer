@@ -123,13 +123,14 @@ fun SinglePlaylistScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
+                            color = MaterialTheme.colorScheme.onBackground,
                             text = playlist.title,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.W400,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
@@ -141,7 +142,8 @@ fun SinglePlaylistScreen(
                                     .clickable {
                                         imagePickerLauncher.launch("image/*")
                                     },
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
                             )
                             Icon(
                                 imageVector = Icons.Default.PlayCircle,
@@ -150,16 +152,19 @@ fun SinglePlaylistScreen(
                                     .clickable {
                                         onMainPlayButtonClickListener(playlist.tracks)
                                     },
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
                             )
                             Icon(
                                 imageVector = Icons.Default.EditNote,
                                 modifier = Modifier
                                     .size(50.dp)
                                     .clickable { playlistEdit(playlist) },
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
                 itemsIndexed(

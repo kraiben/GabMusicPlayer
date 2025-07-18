@@ -94,16 +94,17 @@ fun PlaylistEditOrAddScreen(
         playlistId: Long,
         tracks: List<TrackInfoModel>,
         title: String,
-        coverUri: Uri) -> Unit,
+        coverUri: Uri,
+    ) -> Unit,
     onCreatePlaylist: (List<TrackInfoModel>, String, Uri) -> Unit,
-    onRemovePlaylist: (PlaylistInfoModel) -> Unit = {}
+    onRemovePlaylist: (PlaylistInfoModel) -> Unit = {},
 ) {
 
     var title by remember { mutableStateOf(playlist.title) }
     var coverUri by remember { mutableStateOf(playlist.coverUri) }
     val fallbackCover by remember { mutableIntStateOf(playlist.fallbackCover) }
     val coroutineScope = rememberCoroutineScope()
-    var coverImageKey by remember{mutableLongStateOf(System.currentTimeMillis())}
+    var coverImageKey by remember { mutableLongStateOf(System.currentTimeMillis()) }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -120,8 +121,16 @@ fun PlaylistEditOrAddScreen(
         }
     }
     val permissionState = if (Build.VERSION.SDK_INT >= 33) {
-        rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES){imagePickerLauncher.launch("image/*")}
-    } else rememberPermissionState(Manifest.permission.READ_EXTERNAL_STORAGE){imagePickerLauncher.launch("image/*")}
+        rememberPermissionState(Manifest.permission.READ_MEDIA_IMAGES) {
+            imagePickerLauncher.launch(
+                "image/*"
+            )
+        }
+    } else rememberPermissionState(Manifest.permission.READ_EXTERNAL_STORAGE) {
+        imagePickerLauncher.launch(
+            "image/*"
+        )
+    }
     val acceptedTracks = remember {
         mutableStateListOf<TrackInfoModel>().apply { addAll(playlist.tracks) }
     }
@@ -288,6 +297,7 @@ fun PlaylistEditOrAddScreen(
                         label = { Text(if (areUnacceptedGoingFirst) "Сперва недобавленные" else "Сперва добавленные") },
                         trailingIcon = {
                             Icon(
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 imageVector = if (!areUnacceptedGoingFirst) Icons.Outlined.IndeterminateCheckBox else Icons.Outlined.AddBox,
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp)
@@ -298,7 +308,17 @@ fun PlaylistEditOrAddScreen(
                             selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     )
-                    TextField(value = title, onValueChange = {title = it}, modifier = Modifier.fillMaxWidth())
+                    TextField(
+                        value = title,
+                        onValueChange = { title = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = {
+                            Text(
+                                text = "Название плейлиста",
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    )
                 }
             }
             if (areUnacceptedGoingFirst) {
@@ -357,17 +377,17 @@ fun PlaylistEditOrAddScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .background(color = MaterialTheme.colorScheme.surface)
+                .background(color = MaterialTheme.colorScheme.background)
         ) {
             Button(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 8.dp, vertical = 8.dp)
                     .height(36.dp)
                     .fillMaxWidth(0.5f),
                 onClick = onReturn,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
                 ),
                 contentPadding = PaddingValues(0.dp)
             ) {
@@ -383,7 +403,7 @@ fun PlaylistEditOrAddScreen(
             }
             Button(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 8.dp, vertical = 8.dp)
                     .height(36.dp)
                     .fillMaxWidth(1f),
                 onClick = {
@@ -401,11 +421,10 @@ fun PlaylistEditOrAddScreen(
                             onCreatePlaylist(acceptedTracks.toList(), title, coverUri)
                         }
                     }
-                }
-                ,
+                },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.secondary
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 contentPadding = PaddingValues(0.dp)
             ) {
@@ -514,6 +533,7 @@ fun PlaylistCreationTrackElement(
         },
         trailingContent = {
             Icon(
+                tint = MaterialTheme.colorScheme.onBackground,
                 contentDescription = null,
                 imageVector = if (isAccepted) Icons.Outlined.IndeterminateCheckBox else Icons.Outlined.AddBox,
                 modifier = Modifier
