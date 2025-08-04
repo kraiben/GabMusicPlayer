@@ -1,28 +1,29 @@
 [versions]
-accompanistPermissions = "0.29.0-alpha"
-agp = "8.7.3"
+accompanistPermissions = "0.37.3"
+agp = "8.11.1"
 datastorePreferencesVersion = "1.1.7"
-gson = "2.11.0"
-kotlin = "2.1.0"
+gson = "2.13.1"
+kotlin = "2.2.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.9.1"
+lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
-composeBom = "2025.06.01"
-kotlinxSerializationJson = "1.8.0"
+composeBom = "2025.07.00"
+kotlinxSerializationJson = "1.9.0"
 media = "1.7.0"
 media3Exoplayer = "1.7.1"
 media3Session = "1.7.1"
 paletteKtx = "1.0.0"
 roomKtx = "2.7.2"
-dagger = "2.54"
+dagger = "2.57"
 coilCompose = "2.7.0"
-navigationCompose = "2.9.1"
+navigationCompose = "2.9.2"
 runtimeLivedata = "1.8.3"
 compose_version = "1.7.8"
 firebaseCrashlyticsBuildtools = "3.0.4"
+refreshVersions = "0.60.5"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -69,6 +70,7 @@ firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "fireb
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-versions = { id = "de.fayard.refreshVersions", version.ref = "refreshVersions" }
 
 kotlin-kapt = {id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin"}
 kotlin-serialization = {id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}

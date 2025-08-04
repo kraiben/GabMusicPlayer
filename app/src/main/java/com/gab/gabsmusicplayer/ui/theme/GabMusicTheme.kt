@@ -7,45 +7,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private class Zametka(
-    // Primary colors
-    primary: Color,          // Основной брендовый цвет
-    onPrimary: Color,        // Контент на primary
-    primaryContainer: Color, // Контейнер для primary (например, фон кнопки)
-    onPrimaryContainer: Color, // Контент на primaryContainer
-
-    // Secondary colors
-    secondary: Color,
-    onSecondary: Color,
-    secondaryContainer: Color,
-    onSecondaryContainer: Color,
-
-    // Tertiary colors (доп. акценты)
-    tertiary: Color,
-    onTertiary: Color,
-    tertiaryContainer: Color,
-    onTertiaryContainer: Color,
-
-    // Background & Surface
-    background: Color,       // Фон приложения
-    onBackground: Color,     // Текст/иконки на фоне
-    surface: Color,          // Цвет поверхностей (Card, Modal)
-    onSurface: Color,        // Текст/иконки на surface
-    surfaceVariant: Color,   // Вариант surface (например, Card в другом состоянии)
-    onSurfaceVariant: Color, // Контент на surfaceVariant
-
-    // Error colors
-    error: Color,
-    onError: Color,
-    errorContainer: Color,
-    onErrorContainer: Color,
-
-    // Дополнительные
-    outline: Color,          // Цвет границ (TextField, Divider)
-    outlineVariant: Color,   // Вторичные границы
-    scrim: Color,            // Затемнение (для ModalBottomSheet)
-)
-
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF00E0FF),
     onPrimary = Color(0xFF00E0FF),
@@ -94,7 +55,7 @@ private val LightColorScheme = lightColorScheme(
     errorContainer = Color(0xFF93000A),
     onErrorContainer = Color(0xFFFFDAD6),
 
-    background = Color.White,
+    background = Color(0xFFE6E1E5),
     onBackground = Color.Black,
 
     surface = Color(0xFF1C1B1F),

@@ -19,6 +19,7 @@ import com.gab.gabsmusicplayer.domain.usecases.IsDarkThemeUseCase
 import com.gab.gabsmusicplayer.domain.usecases.RemoveFromPlaylistUseCase
 import com.gab.gabsmusicplayer.domain.usecases.RemovePlaylistUseCase
 import com.gab.gabsmusicplayer.domain.usecases.SetPlaylistPictureUseCase
+import com.gab.gabsmusicplayer.domain.usecases.UpdateUseCase
 import com.gab.gabsmusicplayer.ui.allTracksScreen.AllTracksScreenState
 import com.gab.gabsmusicplayer.utils.GAB_CHECK
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -43,6 +44,7 @@ class MainViewModel @Inject constructor(
     private val decrementDurationUseCase: DecrementDurationUseCase,
     private val isDarkThemeUseCase: IsDarkThemeUseCase,
     private val isDarkThemeChangeUseCase: IsDarkThemeChangeUseCase,
+    private val updateUseCase: UpdateUseCase,
 ) : ViewModel() {
 
     init {
@@ -50,7 +52,9 @@ class MainViewModel @Inject constructor(
             GAB_CHECK("PlaylistsViewModel initialized")
         }
     }
-
+    fun update() {
+        viewModelScope.launch { updateUseCase() }
+    }
     val isThemeDark = isDarkThemeUseCase()
     fun isDarkThemeChange() {
         viewModelScope.launch {

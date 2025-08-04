@@ -9,6 +9,7 @@ interface MusicLoadingRepository {
     fun getAllTracks(): StateFlow<List<TrackInfoModel>>
     fun getPlaylists(): StateFlow<List<PlaylistInfoModel>>
 
+    suspend fun update()
     suspend fun addToPlaylist(playlist: PlaylistInfoModel, track: TrackInfoModel)
     suspend fun removeFromPlaylist(playlist: PlaylistInfoModel, track: TrackInfoModel)
 

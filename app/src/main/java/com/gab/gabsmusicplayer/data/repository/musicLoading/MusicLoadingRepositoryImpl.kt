@@ -3,7 +3,10 @@ package com.gab.gabsmusicplayer.data.repository.musicLoading
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.net.Uri
+import android.net.Uri.EMPTY
+import android.net.Uri.fromFile
 import android.provider.MediaStore
+import androidx.core.net.toUri
 import com.gab.gabsmusicplayer.R
 import com.gab.gabsmusicplayer.di.ApplicationScope
 import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
@@ -13,6 +16,7 @@ import com.gab.gabsmusicplayer.utils.GAB_CHECK
 import com.gab.gabsmusicplayer.utils.mergeWith
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -29,6 +34,7 @@ import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
+import kotlin.system.measureTimeMillis
 
 @ApplicationScope
 class MusicLoadingRepositoryImpl @Inject constructor(
@@ -69,7 +75,10 @@ class MusicLoadingRepositoryImpl @Inject constructor(
         tracksFlowNeedUpdate.emit(Unit)
         tracksFlowNeedUpdate.collect {
             _tracks.clear()
-            _tracks.addAll(loadMusicFiles())
+            val time = measureTimeMillis {
+                _tracks.addAll(loadMusicFiles())
+            }
+            GAB_CHECK(time)
             emit(tracks)
         }
     }
@@ -77,24 +86,9 @@ class MusicLoadingRepositoryImpl @Inject constructor(
         tracksChanges.mergeWith(tracksLoadingFlow)
             .stateIn(coroutineScope, SharingStarted.Eagerly, emptyList())
 
-    init {
-        val ps1  = getPlaylistsFiles()
-        val ps2 = getPlaylistsImageFiles()
-
-//        ps1.forEach {
-//            it.delete()
-//        }
-//        ps2.forEach {
-//            it.delete()
-//        }
-//
-//        ps1.forEach {
-//            GAB_CHECK(it)
-//        }
-//        ps2.forEach {
-//            GAB_CHECK(it)
-//        }
-
+    override suspend fun update() {
+        tracksFlowNeedUpdate.emit(Unit)
+        playlistsFlowNeedUpdate.emit(Unit)
     }
 
     override fun getPlaylists(): StateFlow<List<PlaylistInfoModel>> = playlistsFlow
@@ -104,7 +98,7 @@ class MusicLoadingRepositoryImpl @Inject constructor(
         return !playlists.any { it.title == title }
     }
 
-    override suspend fun isTitleUniqueForEdit(playlistId: Long, title: String ): Boolean {
+    override suspend fun isTitleUniqueForEdit(playlistId: Long, title: String): Boolean {
         return !playlists.any {
             (it.title == title) && (it.id != playlistId)
         }
@@ -148,7 +142,7 @@ class MusicLoadingRepositoryImpl @Inject constructor(
                 coverUri = try {
                     copyImageToLocalFile(title = title, uri = coverUri)
                 } catch (_: Exception) {
-                    Uri.EMPTY
+                    EMPTY
                 },
                 fallbackCover = getFallbackAlbumCover(),
                 createdAt = Date()
@@ -175,7 +169,7 @@ class MusicLoadingRepositoryImpl @Inject constructor(
             title = title,
             tracks = tracks,
             coverUri = copyImageToLocalFile(title, coverUri)
-            )
+        )
         coroutineScope.launch {
             writePlaylistIntoM3U(newPlaylistInfo)
             if (title != oldPlaylistInfo.title) {
@@ -221,7 +215,7 @@ class MusicLoadingRepositoryImpl @Inject constructor(
                 input.copyTo(output)
             }
         }
-        return Uri.fromFile(imageFile)
+        return fromFile(imageFile)
     }
 
     override suspend fun setPlaylistPicture(playlist: PlaylistInfoModel, uri: Uri) {
@@ -241,16 +235,17 @@ class MusicLoadingRepositoryImpl @Inject constructor(
 
     }
 
-    private fun readPlaylistFromM3U(file: File): PlaylistInfoModel {
+    private suspend fun readPlaylistFromM3U(file: File): PlaylistInfoModel {
         val tracks = mutableListOf<TrackInfoModel>()
-        var uri: Uri = Uri.EMPTY
+        var uri: Uri = EMPTY
         var createdAt = Date()
+        var tracksAddJob: Job? = null
         withFileLock(file) {
             try {
                 file.bufferedReader().use { f ->
                     if (f.readLine() != PLAYLIST_FILE_HEADER) throw InterruptedException("Неверно записан плейлист")
                     val _uri = f.readLine()
-                    if (_uri != "") uri = Uri.parse(_uri)
+                    if (_uri != "") uri = _uri.toUri()
                     createdAt = try {
                         Date(f.readLine().toLong())
                     } catch (_: Exception) {
@@ -259,9 +254,12 @@ class MusicLoadingRepositoryImpl @Inject constructor(
                     while (f.readLine() == PLAYLIST_FILE_TRACK_INFO_HEADER) {
                         val title = f.readLine()
                         val path = f.readLine()
-                        tracks.addAll(
-                            loadMusicFileByTitleAndPath(title, path)
-                        )
+                        tracksAddJob = coroutineScope.launch {
+                            tracks.addAll(
+                                loadMusicFileByTitleAndPath(title, path)
+                            )
+                        }
+
                     }
                 }
             } catch (e: Exception) {
@@ -270,7 +268,7 @@ class MusicLoadingRepositoryImpl @Inject constructor(
                 return@withFileLock PlaylistInfoModel.EMPTY
             }
         }
-
+        tracksAddJob?.join()
         val playlist = PlaylistInfoModel(
             getNewId(),
             file.nameWithoutExtension,
@@ -283,7 +281,7 @@ class MusicLoadingRepositoryImpl @Inject constructor(
         return playlist
     }
 
-    private fun writePlaylistIntoM3U(playlist: PlaylistInfoModel) {
+    private suspend fun writePlaylistIntoM3U(playlist: PlaylistInfoModel) {
         val file = getOrCreatePlaylistFile(playlist)
         val tempFile = File("${file.path}.tmp")
         withFileLock(file) {
@@ -308,7 +306,6 @@ class MusicLoadingRepositoryImpl @Inject constructor(
                     throw IOException("Не удалось переименовать временный файл в целевой.")
                 }
             } catch (e: IOException) {
-                println("Ошибка при записи в файл: ${e.message}")
                 if (tempFile.exists()) {
                     tempFile.delete()
                 }
@@ -358,7 +355,8 @@ class MusicLoadingRepositoryImpl @Inject constructor(
         return file
 
     }
-    private fun loadMusicFileByTitleAndPath(
+
+    private suspend fun loadMusicFileByTitleAndPath(
         titleToFind: String,
         pathToFind: String,
     ): List<TrackInfoModel> {
@@ -378,17 +376,17 @@ class MusicLoadingRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun loadMusicFiles(): List<TrackInfoModel> {
+    private suspend fun loadMusicFiles(): List<TrackInfoModel> {
         GAB_CHECK("load started")
         val selectionArgs = arrayOf<String>()
         val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
         return getTracksFormMediaStore(selection, selectionArgs)
     }
 
-    private fun getTracksFormMediaStore(
+    private suspend fun getTracksFormMediaStore(
         selection: String,
         selectionArgs: Array<String>,
-    ): MutableList<TrackInfoModel> {
+    ): MutableList<TrackInfoModel> = withContext(Dispatchers.IO) {
         val tracks = mutableListOf<TrackInfoModel>()
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
@@ -401,8 +399,8 @@ class MusicLoadingRepositoryImpl @Inject constructor(
             MediaStore.Audio.Media.DATE_ADDED,
         )
         val sortOrder = MediaStore.Audio.Media.DATE_ADDED + " DESC"
-
         val cursor = contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)
+        val jobList = mutableListOf<Job>()
         cursor?.use {
             val idColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
             val titleColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
@@ -421,32 +419,44 @@ class MusicLoadingRepositoryImpl @Inject constructor(
                 val dateAdded = Date(it.getLong(dateAddedColumn) * 1000)
                 val albumArtUri =
                     ContentUris.withAppendedId(
-                        Uri.parse("content://media/external/audio/albumart"),
+                        "content://media/external/audio/albumart".toUri(),
                         it.getLong(albumArtColumn)
                     )
-                val albumUriPatch = getFallbackAlbumCover()
-                val musicFile =
-                    TrackInfoModel(
-                        id,
-                        title,
-                        artist,
-                        path,
-                        duration,
-                        albumArtUri,
-                        albumUriPatch,
-                        dateAdded
-                    )
-                tracks.add(musicFile)
+                jobList.add(coroutineScope.launch {
+                    val albumUriPatch = getFallbackAlbumCover()
+                    val musicFile =
+                        TrackInfoModel(
+                            id,
+                            title,
+                            artist,
+                            path,
+                            duration,
+                            if (isRightUri(albumArtUri)) albumArtUri else Uri.EMPTY,
+                            albumUriPatch,
+                            dateAdded
+                        )
+                    tracks.add(musicFile)
+                })
             }
         }
+        jobList.forEach { it.join() }
+        tracks
+    }
 
-        return tracks
+    private fun isRightUri(uri: Uri): Boolean {
+        try {
+            val ist = contentResolver.openInputStream(uri)
+            ist?.close()
+            return ist != null
+        } catch (_: Exception) {
+            return false
+        }
     }
 
     companion object {
         private val locks = ConcurrentHashMap<String, Any>()
 
-        fun <T> withFileLock(file: File, action: () -> T): T {
+        suspend fun <T> withFileLock(file: File, action: () -> T): T {
             val lock = locks.getOrPut(file.absolutePath) { Any() }
             return synchronized(lock) {
                 action()
@@ -466,7 +476,6 @@ class MusicLoadingRepositoryImpl @Inject constructor(
             R.drawable.gpic_cg_boat2,
             R.drawable.gpic_cg_dream1_1,
             R.drawable.gpic_cg_dream3_3,
-            R.drawable.gpic_from_niko,
             R.drawable.gpic_megumindk,
             R.drawable.gpic_miku_headphones,
             R.drawable.gpic_sol_flight2,

@@ -29,6 +29,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
+import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
 import com.gab.gabsmusicplayer.ui.ViewModelFactory
 import com.gab.gabsmusicplayer.ui.allTracksScreen.AllTracksScreen
 import com.gab.gabsmusicplayer.ui.allTracksScreen.AllTracksScreenState
@@ -62,6 +64,7 @@ import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistEditOrAddScreen
 import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistScreenState
 import com.gab.gabsmusicplayer.ui.playlistScreens.SinglePlaylistScreen
 import com.gab.gabsmusicplayer.ui.theme.GabsMusicPlayerTheme
+import com.gab.gabsmusicplayer.utils.GAB_CHECK
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
@@ -69,11 +72,13 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 
-@OptIn(
-    ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class
-)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
+
+    val musicViewModel: MusicViewModel = viewModel(factory = viewModelFactory)
+    val mainViewModel: MainViewModel = viewModel(factory = viewModelFactory)
+
     val navigationState = rememberNavigationState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -81,9 +86,7 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
         permission =
         if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO
         else Manifest.permission.READ_EXTERNAL_STORAGE
-    )
-    GetPermission(readExtStoragePermissionState)
-
+    ) {mainViewModel.update()}
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val snackbarHostState = remember { SnackbarHostState() }
@@ -99,8 +102,6 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
         NavigationItem.AllPlaylists
     )
 
-    val musicViewModel: MusicViewModel = viewModel(factory = viewModelFactory)
-    val mainViewModel: MainViewModel = viewModel(factory = viewModelFactory)
 
     val tracksState = mainViewModel.tracks.collectAsState(AllTracksScreenState.Initial)
     val tracksWithoutDurationFilterState = mainViewModel.tracksWithoutDurationFilter
@@ -114,6 +115,17 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                 .showSnackbar(message = "Название плейлиста должно быть уникально")
         }
     }
+    val navigateToPlayer = remember { { scope.launch { sheetState.show() } } }
+    val onTrackClickListener  = remember {
+        {tracks: List<TrackInfoModel>, startIndex: Int?,   ->
+            musicViewModel.selectTrack(tracks = tracks, startIndex = startIndex ?: 0,
+                navigateToPlayer = {
+                    GAB_CHECK("navigateToPlayer")
+                    navigateToPlayer()
+                                   }, context = context)
+        }
+    }
+    val addInOrder = remember { {it: TrackInfoModel -> musicViewModel.setNextTrack(it) } }
 
     GabsMusicPlayerTheme(darkTheme = isThemeDarkState.value) {
         (context as? ComponentActivity)?.enableEdgeToEdge(
@@ -157,8 +169,8 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                     Scaffold(
                         snackbarHost = { SnackbarHost(snackbarHostState) },
                         bottomBar = {
-                            if ((musicViewModel.title != "null")
-                                && (musicViewModel.imageUri.toString() != "") && (destinationFlow.value?.destination?.route != Screen.PlaylistEditOrAddScreen.route)
+                            if ((musicViewModel.title != "")
+                                && (destinationFlow.value?.destination?.route != Screen.PlaylistEditOrAddScreen.route)
                             ) {
                                 MiniPlayer(
                                     modifier = Modifier
@@ -177,22 +189,18 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                         },
                     ) { paddingValues ->
                         Box {
+                            val menuButtonClickListener = remember {{ scope.launch { drawerState.open() } }}
+
                             MusicNavGraph(
                                 navHostController = navigationState.navHostController,
                                 playlistScreenContent = { playlistId ->
                                     SinglePlaylistScreen(
                                         playlistId,
-                                        onTrackClickListener = { tracks, startIndex ->
-                                            musicViewModel.selectTrack(
-                                                tracks = tracks,
-                                                startIndex = startIndex,
-                                                context = context,
-                                                navigateToPlayer = { scope.launch { sheetState.show() } }
-                                            )
-                                        },
+                                        onTrackClickListener = onTrackClickListener,
                                         onMainPlayButtonClickListener = { tracks ->
                                             musicViewModel.selectTrack(
                                                 tracks = tracks,
+                                                isShuffled = true,
                                                 context = context,
                                                 navigateToPlayer = { scope.launch { sheetState.show() } }
                                             )
@@ -261,6 +269,12 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                                     )
                                 },
                                 allTracksScreenContent = {
+                                    val trackOptionsMenuClickListener = remember {
+                                        { track: TrackInfoModel ->
+                                            trackOptionsMenuState.value = TrackOptionsMenuState
+                                                .AllTracksScreenMenu(track)
+                                        }
+                                    }
                                     AllTracksScreen(
                                         onStartRandomButtonClickListener = { tracks ->
                                             musicViewModel.selectTrack(
@@ -270,22 +284,12 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                                                 navigateToPlayer = { scope.launch { sheetState.show() } }
                                             )
                                         },
-                                        onTrackClickListener = { p1, p2 ->
-                                            musicViewModel.selectTrack(
-                                                tracks = p1,
-                                                startIndex = p2,
-                                                context = context,
-                                                navigateToPlayer = { scope.launch { sheetState.show() } }
-                                            )
-                                        },
+                                        onTrackClickListener = onTrackClickListener,
                                         padding = paddingValues,
-                                        menuButtonClickListener = { scope.launch { drawerState.open() } },
-                                        addInOrderOption = { musicViewModel.setNextTrack(it) },
+                                        menuButtonClickListener = { menuButtonClickListener() },
+                                        addInOrderOption = addInOrder,
                                         snackbarHostState = snackbarHostState,
-                                        trackOptionsMenuClickListener = { track ->
-                                            trackOptionsMenuState.value = TrackOptionsMenuState
-                                                .AllTracksScreenMenu(track)
-                                        },
+                                        trackOptionsMenuClickListener = trackOptionsMenuClickListener,
                                         tracksState = tracksState.value
                                     )
                                 }
@@ -311,7 +315,7 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                                 playlistsState = playlistsState.value,
                                 state = trackOptionsMenuState.value,
                                 creatingPlaylistResultFlow = mainViewModel.playlistCreationOrEditingResultFlow,
-                                playNext = { t -> musicViewModel.setNextTrack(t) },
+                                playNext = addInOrder,
                                 createPlaylist = { track, title ->
                                     mainViewModel.createPlaylist(
                                         tracks = listOf(track), title = title, coverUri = Uri.EMPTY
@@ -337,6 +341,9 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
                     }
                 }
             } else {
+                SideEffect {
+                    readExtStoragePermissionState.launchPermissionRequest()
+                }
                 Text(
                     text = "Request Perms",
                     fontSize = 40.sp,

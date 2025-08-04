@@ -73,6 +73,7 @@ import com.gab.gabsmusicplayer.ui.general.SortChip
 import com.gab.gabsmusicplayer.ui.general.SortOder
 import com.gab.gabsmusicplayer.ui.general.SortOrderState
 import com.gab.gabsmusicplayer.ui.general.SortParameter
+import com.gab.gabsmusicplayer.utils.GAB_CHECK
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -407,6 +408,7 @@ fun PlaylistEditOrAddScreen(
                     .height(36.dp)
                     .fillMaxWidth(1f),
                 onClick = {
+                    GAB_CHECK("1")
                     when (screenMode) {
                         PlaylistChangesScreenMode.EditMode -> {
                             onSavePlaylistChanges(
@@ -421,6 +423,7 @@ fun PlaylistEditOrAddScreen(
                             onCreatePlaylist(acceptedTracks.toList(), title, coverUri)
                         }
                     }
+                    GAB_CHECK("2")
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -505,10 +508,8 @@ fun PlaylistCreationTrackElement(
                     .fillMaxHeight()
                     .aspectRatio(1f), contentDescription = null,
                 model = (ImageRequest.Builder(LocalContext.current)
-                    .data(track.albumArtUri)
-                    .error(track.albumArtUriIsNullPatchId)
-                    .memoryCacheKey("${track.albumArtUri}-${track.albumArtUriIsNullPatchId}")
-
+                    .data(if (track.albumArtUri == Uri.EMPTY) track.albumArtUriIsNullPatchId else track.albumArtUri)
+                    .memoryCacheKey(track.id.toString())
                     .build())
             )
         },

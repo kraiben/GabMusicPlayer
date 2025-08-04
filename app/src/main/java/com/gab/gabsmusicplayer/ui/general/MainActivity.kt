@@ -23,6 +23,13 @@ class MainActivity : ComponentActivity() {
         component.inject(this)
         super.onCreate(savedInstanceState)
         setContent {
-            MusicMainScreen(viewModelFactory) }
+//            val list = remember { mutableStateOf((0..100).map { it -> (it to "Element $it") }.toList()) }
+//            LazyColumn(modifier = Modifier.background(color = Color(0xFFFFFFFF)).fillMaxSize()) {
+//                items(list.value, key = {it.first}) {el ->
+//                    Text(modifier = Modifier.fillMaxWidth().height(50.dp), text = el.second, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+//                }
+//            }
+            MusicMainScreen(viewModelFactory)
+        }
     }
 }
