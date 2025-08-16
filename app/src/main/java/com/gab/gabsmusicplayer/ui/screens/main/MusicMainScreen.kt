@@ -44,8 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
-import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
 import com.gab.gabsmusicplayer.ui.ViewModelFactory
 import com.gab.gabsmusicplayer.ui.allTracksScreen.AllTracksScreen
 import com.gab.gabsmusicplayer.ui.allTracksScreen.AllTracksScreenState
@@ -65,6 +63,8 @@ import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistScreenState
 import com.gab.gabsmusicplayer.ui.playlistScreens.SinglePlaylistScreen
 import com.gab.gabsmusicplayer.ui.theme.GabsMusicPlayerTheme
 import com.gab.gabsmusicplayer.utils.GAB_CHECK
+import com.gab.core_music_loading.models.PlaylistInfoModel
+import com.gab.core_music_loading.models.TrackInfoModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
@@ -126,7 +126,6 @@ fun MusicMainScreen(viewModelFactory: ViewModelFactory) {
         }
     }
     val addInOrder = remember { {it: TrackInfoModel -> musicViewModel.setNextTrack(it) } }
-
     GabsMusicPlayerTheme(darkTheme = isThemeDarkState.value) {
         (context as? ComponentActivity)?.enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(

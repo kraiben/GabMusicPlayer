@@ -17,11 +17,11 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
 import com.gab.gabsmusicplayer.ui.player.MusicService
 import com.gab.gabsmusicplayer.utils.GAB_CHECK
 import com.gab.gabsmusicplayer.utils.moveTrackToStartOfQuery
 import com.gab.gabsmusicplayer.utils.setPlaylist
+import com.gab.core_music_loading.models.TrackInfoModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch

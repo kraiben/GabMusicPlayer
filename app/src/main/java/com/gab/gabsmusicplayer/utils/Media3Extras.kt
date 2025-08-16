@@ -3,7 +3,7 @@ package com.gab.gabsmusicplayer.utils
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaController
-import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
+import com.gab.core_music_loading.models.TrackInfoModel
 import kotlin.random.Random
 
 fun MediaController.setPlaylist(

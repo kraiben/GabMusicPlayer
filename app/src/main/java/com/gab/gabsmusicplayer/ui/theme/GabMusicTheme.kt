@@ -81,3 +81,54 @@ fun GabsMusicPlayerTheme(
     )
 }
 
+//@Composable
+//fun MaterialTheme2(
+//    colorScheme: ColorScheme = MaterialTheme.colorScheme,
+//    shapes: Shapes = MaterialTheme.shapes,
+//    typography: androidx.compose.material3.Typography = MaterialTheme.typography,
+//    content: @Composable () -> Unit
+//) {
+//    val rippleIndication = rippleOrFallbackImplementation()
+//    val selectionColors = rememberTextSelectionColors(colorScheme)
+//    @Suppress("DEPRECATION_ERROR")
+//    CompositionLocalProvider(
+//        LocalColorScheme provides colorScheme,
+//        LocalIndication provides rippleIndication,
+//        // TODO: b/304985887 - remove after one stable release
+//        androidx.compose.material.ripple.LocalRippleTheme provides CompatRippleTheme,
+//        LocalShapes provides shapes,
+//        LocalTextSelectionColors provides selectionColors,
+//        LocalTypography provides typography,
+//    ) {
+//        ProvideTextStyle(value = typography.bodyLarge, content = content)
+//    }
+//}
+
+//@Suppress("DEPRECATION_ERROR")
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//internal fun rippleOrFallbackImplementation(
+//    bounded: Boolean = true,
+//    radius: Dp = Dp.Unspecified,
+//    color: Color = Color.Unspecified
+//): Indication {
+//    return if (LocalUseFallbackRippleImplementation.current) {
+//        androidx.compose.material.ripple.rememberRipple(bounded, radius, color)
+//    } else {
+//        ripple(bounded, radius, color)
+//    }
+//}
+//@Composable
+//internal fun rememberTextSelectionColors(colorScheme: ColorScheme): TextSelectionColors {
+//    val primaryColor = colorScheme.primary
+//    return remember(primaryColor) {
+//        TextSelectionColors(
+//            handleColor = primaryColor,
+//            backgroundColor = primaryColor.copy(alpha = TextSelectionBackgroundOpacity),
+//        )
+//    }
+//}
+//const val TextSelectionBackgroundOpacity = 0.4f
+//internal val LocalColorScheme = staticCompositionLocalOf { lightColorScheme() }
+//internal val LocalShapes = staticCompositionLocalOf { Shapes() }
+//internal val LocalTypography = staticCompositionLocalOf { Typography() }

@@ -45,10 +45,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
-import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
 import com.gab.gabsmusicplayer.ui.general.LoadingCircle
 import com.gab.gabsmusicplayer.ui.general.tracksList.TrackListElement
+import com.gab.core_music_loading.models.PlaylistInfoModel
+import com.gab.core_music_loading.models.TrackInfoModel
 
 @Composable
 fun SinglePlaylistScreen(

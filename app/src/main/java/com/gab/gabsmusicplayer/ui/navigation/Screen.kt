@@ -1,8 +1,8 @@
 package com.gab.gabsmusicplayer.ui.navigation
 
 import android.net.Uri
-import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
 import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistChangesScreenMode
+import com.gab.core_music_loading.models.PlaylistInfoModel
 import com.google.gson.Gson
 
 sealed class Screen(val route: String) {

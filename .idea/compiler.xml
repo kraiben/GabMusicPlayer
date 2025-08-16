@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="21" />
+    <bytecodeTargetLevel target="17" />
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="gabs_music_player.core-db.main" options="-proc:none" />
+      <module name="gabs_music_player.core-db.test" options="-proc:none" />
+      <module name="gabs_music_player.model-module.main" options="-proc:none" />
+      <module name="gabs_music_player.model-module.test" options="-proc:none" />
+    </option>
   </component>
 </project>

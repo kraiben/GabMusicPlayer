@@ -6,8 +6,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
 import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistChangesScreenMode
+import com.gab.core_music_loading.models.PlaylistInfoModel
 import com.google.gson.Gson
 
 fun NavGraphBuilder.playlistNavGraph(

@@ -1,6 +1,7 @@
 package com.gab.gabsmusicplayer.ui.allTracksScreen
 
-import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
+import com.gab.core_music_loading.models.TrackInfoModel
+
 
 sealed class AllTracksScreenState {
     data object Initial : AllTracksScreenState()
