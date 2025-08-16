@@ -1,4 +1,7 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -10,9 +13,6 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
-    plugins {
-        id("de.fayard.refreshVersions") version "0.60.5"
-    }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -21,7 +21,11 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+rootProject.name = "gabs_music_player"
 
-rootProject.name = "Gab's music player"
 include(":app")
- 
+//include(":feature-playlists")
+include(":injection-module")
+include(":core-music-loading")
+include(":model-module")
+include(":core-settings")

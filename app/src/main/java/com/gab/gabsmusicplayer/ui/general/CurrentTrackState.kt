@@ -1,7 +1,7 @@
 package com.gab.gabsmusicplayer.ui.general
 
 import androidx.compose.runtime.Stable
-import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
+import com.gab.core_music_loading.models.TrackInfoModel
 
 @Stable
 sealed class CurrentTrackState {

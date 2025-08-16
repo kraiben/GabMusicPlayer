@@ -5,8 +5,8 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
 import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistChangesScreenMode
+import com.gab.core_music_loading.models.PlaylistInfoModel
 
 class NavigationState(
     val navHostController: NavHostController,
@@ -30,7 +30,7 @@ class NavigationState(
         playlist: PlaylistInfoModel,
         screenMode: PlaylistChangesScreenMode,
 
-    ) {
+        ) {
         navHostController.navigate(
             Screen.PlaylistEditOrAddScreen.getRouteWithArgs(
                 playlist,

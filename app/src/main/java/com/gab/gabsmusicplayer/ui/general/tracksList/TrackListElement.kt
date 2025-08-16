@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
+import com.gab.core_music_loading.models.TrackInfoModel
 
 @Composable
 fun TrackListElement(

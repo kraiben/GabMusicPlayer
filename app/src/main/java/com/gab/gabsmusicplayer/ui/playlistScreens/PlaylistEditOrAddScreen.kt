@@ -66,14 +66,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
-import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
 import com.gab.gabsmusicplayer.ui.allTracksScreen.AllTracksScreenState
 import com.gab.gabsmusicplayer.ui.general.SortChip
 import com.gab.gabsmusicplayer.ui.general.SortOder
 import com.gab.gabsmusicplayer.ui.general.SortOrderState
 import com.gab.gabsmusicplayer.ui.general.SortParameter
 import com.gab.gabsmusicplayer.utils.GAB_CHECK
+import com.gab.core_music_loading.models.PlaylistInfoModel
+import com.gab.core_music_loading.models.TrackInfoModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState

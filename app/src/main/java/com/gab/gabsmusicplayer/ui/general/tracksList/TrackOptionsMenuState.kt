@@ -1,7 +1,7 @@
 package com.gab.gabsmusicplayer.ui.general.tracksList
 
-import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
-import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
+import com.gab.core_music_loading.models.PlaylistInfoModel
+import com.gab.core_music_loading.models.TrackInfoModel
 
 sealed class TrackOptionsMenuState(val isVisible: Boolean) {
 

@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
 import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistChangesScreenMode
+import com.gab.core_music_loading.models.PlaylistInfoModel
 
 @Composable
 fun MusicNavGraph(

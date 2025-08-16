@@ -30,9 +30,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.gab.gabsmusicplayer.domain.models.PlaylistInfoModel
-import com.gab.gabsmusicplayer.domain.models.TrackInfoModel
 import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistScreenState
+import com.gab.core_music_loading.models.PlaylistInfoModel
+import com.gab.core_music_loading.models.TrackInfoModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
