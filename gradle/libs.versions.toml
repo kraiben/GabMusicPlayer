@@ -12,10 +12,11 @@ lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
 composeBom = "2025.08.00"
 kotlinxSerializationJson = "1.9.0"
+foundation = "1.9.0"
 media = "1.7.1"
 media3Exoplayer = "1.8.0"
 media3Session = "1.8.0"
-dagger = "2.57"
+dagger = "2.57.1"
 coilCompose = "2.7.0"
 navigationCompose = "2.9.3"
 runtime = "1.9.0"
@@ -24,6 +25,7 @@ firebaseCrashlyticsBuildtools = "3.0.6"
 composeGradlePlugin = "1.8.2"
 appcompat = "1.7.1"
 material = "1.12.0"
+materialVersion = "1.12.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -68,7 +70,8 @@ gradleplugin-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler
 gradleplugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 org-jetbrains-kotlin-plugin-serialization-gradle-plugin = { module = "org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin", version.ref = "kotlin" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

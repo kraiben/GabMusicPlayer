@@ -30,16 +30,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistScreenState
-import com.gab.core_music_loading.models.PlaylistInfoModel
-import com.gab.core_music_loading.models.TrackInfoModel
+//import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistScreenState
+import com.gab.music_entities_module.TrackInfoModel
+import com.gab.music_entities_module.PlaylistInfoModel
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun TrackOptionsMenu(
     onDismiss: () -> Unit,
     modifier: Modifier,
-    playlistsState: PlaylistScreenState,
+//    playlistsState: PlaylistScreenState,
     state: TrackOptionsMenuState,
     creatingPlaylistResultFlow: Flow<Boolean>,
     playNext: (TrackInfoModel) -> Unit,
@@ -106,24 +106,24 @@ fun TrackOptionsMenu(
                         }
                     }
 
-                    is TrackOptionsMenuState.AddToPlaylistMenu -> {
-                        OptionsMenuElement("Выберите плейлист") { }
-                        HorizontalDivider(
-                            color = Color.Gray,
-                            thickness = 1.dp,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                        val playlists = if (playlistsState is PlaylistScreenState.Playlists) {
-                            playlistsState.playlists
-                        } else emptyList()
-                        playlists.forEach { p ->
-                            OptionsMenuElement(p.title) {
-                                addToPlaylist(state.track, p)
-                                onDismiss()
-                            }
-                        }
-                        OptionsMenuElement("Создать новый") { goToAddInNewPlaylistMenu(state.track) }
-                    }
+//                    is TrackOptionsMenuState.AddToPlaylistMenu -> {
+//                        OptionsMenuElement("Выберите плейлист") { }
+//                        HorizontalDivider(
+//                            color = Color.Gray,
+//                            thickness = 1.dp,
+//                            modifier = Modifier.padding(vertical = 8.dp)
+//                        )
+//                        val playlists = if (playlistsState is PlaylistScreenState.Playlists) {
+//                            playlistsState.playlists
+//                        } else emptyList()
+//                        playlists.forEach { p ->
+//                            OptionsMenuElement(p.title) {
+//                                addToPlaylist(state.track, p)
+//                                onDismiss()
+//                            }
+//                        }
+//                        OptionsMenuElement("Создать новый") { goToAddInNewPlaylistMenu(state.track) }
+//                    }
 
                     is TrackOptionsMenuState.AllTracksScreenMenu -> {
                         OptionsMenuElement(state.track.title) { }
@@ -152,6 +152,8 @@ fun TrackOptionsMenu(
                             )
                         }
                     }
+
+                    is TrackOptionsMenuState.AddToPlaylistMenu -> TODO()
                 }
             }
         }

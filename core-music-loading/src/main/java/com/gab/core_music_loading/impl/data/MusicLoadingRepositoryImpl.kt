@@ -11,8 +11,8 @@ import com.gab.core_music_loading.GAB_CHECK
 import com.gab.core_music_loading.R
 import com.gab.core_music_loading.api.data.MusicLoadingRepository
 import com.gab.core_music_loading.mergeWith
-import com.gab.core_music_loading.models.PlaylistInfoModel
-import com.gab.core_music_loading.models.TrackInfoModel
+import com.gab.music_entities_module.TrackInfoModel
+import com.gab.music_entities_module.PlaylistInfoModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -63,7 +63,7 @@ internal class MusicLoadingRepositoryImpl @Inject constructor(
         }
     }
     private val playlistsFlow = playlistsChanges.mergeWith(playlistsLoadingFlow)
-        .stateIn(coroutineScope, SharingStarted.Eagerly, emptyList())
+        .stateIn(coroutineScope, SharingStarted.Lazily, emptyList())
 
     private val _tracks = mutableListOf<TrackInfoModel>()
     private val tracks: List<TrackInfoModel>
@@ -83,7 +83,7 @@ internal class MusicLoadingRepositoryImpl @Inject constructor(
     }
     private val tracksFlow =
         tracksChanges.mergeWith(tracksLoadingFlow)
-            .stateIn(coroutineScope, SharingStarted.Eagerly, emptyList())
+            .stateIn(coroutineScope, SharingStarted.Lazily, emptyList())
 
     override suspend fun update() {
         tracksFlowNeedUpdate.emit(Unit)

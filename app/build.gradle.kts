@@ -5,7 +5,6 @@ plugins {
 }
 
 android {
-
     namespace = "com.gab.gabsmusicplayer"
 
     defaultConfig {
@@ -18,11 +17,6 @@ android {
         debug {
             isMinifyEnabled = false
         }
-//        debug {
-//            isDebuggable = false
-//            isMinifyEnabled = true
-//            isShrinkResources = true
-//        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -32,7 +26,6 @@ android {
             )
         }
     }
-
 }
 
 dependencies {
@@ -40,6 +33,11 @@ dependencies {
     implementation(projects.coreMusicLoading)
     implementation(projects.coreSettings)
     implementation(projects.modelModule)
+    implementation(projects.coreMedia)
+    implementation(projects.musicEntitiesModule)
+    implementation(projects.modelMediaUsecases)
+    implementation(projects.featureAllTracks)
+//    implementation(projects.feat)
 
     implementation(libs.datastore.preferences)
 

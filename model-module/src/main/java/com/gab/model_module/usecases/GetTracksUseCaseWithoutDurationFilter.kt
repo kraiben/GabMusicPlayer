@@ -1,6 +1,6 @@
 package com.gab.model_module.usecases
 
-import com.gab.core_music_loading.models.TrackInfoModel
+import com.gab.music_entities_module.TrackInfoModel
 import kotlinx.coroutines.flow.StateFlow
 
 public interface GetTracksUseCaseWithoutDurationFilter {

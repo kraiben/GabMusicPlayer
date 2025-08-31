@@ -48,119 +48,119 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.gab.gabsmusicplayer.ui.screens.main.MusicViewModel
+import com.gab.gabsmusicplayer.ui.player.MusicViewModel
 import java.util.Locale
 
 @Composable
 fun MusicPlayerScreen(
     viewModel: MusicViewModel,
 ) {
-    Column(
-        modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.background)
-            .fillMaxSize()
-            .padding(horizontal = 12.dp)
-            .statusBarsPadding()
-            .navigationBarsPadding()
-    ) {
-        Spacer(modifier = Modifier.height(50.dp))
-        AsyncImage(
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .clip(shape = RoundedCornerShape(16))
-                .fillMaxWidth()
-                .aspectRatio(1f),
-            contentDescription = null,
-            model = (ImageRequest.Builder(LocalContext.current)
-                .data(viewModel.imageUri)
-                .error(viewModel.artworkData)
-                .memoryCacheKey("${viewModel.imageUri}-${viewModel.artworkData}")
-                .build())
-        )
-        Text(
-            color = MaterialTheme.colorScheme.onBackground,
-            text = viewModel.title,
-            maxLines = 1,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.W400,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .wrapContentHeight()
-                .padding(top = 24.dp, bottom = 8.dp)
-        )
-        Text(
-            text = viewModel.artist,
-            maxLines = 1,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.W100,
-            modifier = Modifier
-                .wrapContentHeight()
-                .padding(bottom = 24.dp),
-            overflow = TextOverflow.Ellipsis
-        )
-
-        MediaPlayerSlider(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            duration = viewModel.duration,
-            onValueChanged = { newPosition ->
-                viewModel.onSliderChange(newPosition)
-            },
-            currentPosition = viewModel.currentPosition
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            IconButton(onClick = { viewModel.shuffleStateChange() }) {
-                Icon(
-                    contentDescription = null,
-                    imageVector =
-                    if (viewModel.isShuffleModeSet) Icons.Default.ShuffleOn else Icons.Default.Shuffle,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            IconButton(onClick = { viewModel.previousTrack() }) {
-                Icon(
-                    Icons.Default.SkipPrevious,
-                    "Previous",
-                    modifier = Modifier.size(80.dp),
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            IconButton(onClick = {
-                viewModel.playPauseChange()
-            }) {
-                Icon(
-                    if (viewModel.isTrackPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    if (viewModel.isTrackPlaying) "Pause" else "Play",
-                    modifier = Modifier.size(80.dp),
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            IconButton(onClick = { viewModel.nextTrack() }) {
-                Icon(
-                    Icons.Default.SkipNext,
-                    "Next",
-                    modifier = Modifier.size(80.dp),
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            IconButton(onClick = { viewModel.isRepeatingOneStateChange() }) {
-                Icon(
-                    contentDescription = null,
-                    imageVector = if (viewModel.isRepeatingOne) Icons.Default.RepeatOne else Icons.Default.Repeat,
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        }
-    }
+//    Column(
+//        modifier = Modifier
+//            .background(color = MaterialTheme.colorScheme.background)
+//            .fillMaxSize()
+//            .padding(horizontal = 12.dp)
+//            .statusBarsPadding()
+//            .navigationBarsPadding()
+//    ) {
+//        Spacer(modifier = Modifier.height(50.dp))
+//        AsyncImage(
+//            contentScale = ContentScale.Crop,
+//            modifier = Modifier
+//                .clip(shape = RoundedCornerShape(16))
+//                .fillMaxWidth()
+//                .aspectRatio(1f),
+//            contentDescription = null,
+//            model = (ImageRequest.Builder(LocalContext.current)
+//                .data(viewModel.imageUri)
+//                .error(viewModel.artworkData)
+//                .memoryCacheKey("${viewModel.imageUri}-${viewModel.artworkData}")
+//                .build())
+//        )
+//        Text(
+//            color = MaterialTheme.colorScheme.onBackground,
+//            text = viewModel.title,
+//            maxLines = 1,
+//            fontSize = 28.sp,
+//            fontWeight = FontWeight.W400,
+//            overflow = TextOverflow.Ellipsis,
+//            modifier = Modifier
+//                .wrapContentHeight()
+//                .padding(top = 24.dp, bottom = 8.dp)
+//        )
+//        Text(
+//            text = viewModel.artist,
+//            maxLines = 1,
+//            fontSize = 12.sp,
+//            fontWeight = FontWeight.W100,
+//            modifier = Modifier
+//                .wrapContentHeight()
+//                .padding(bottom = 24.dp),
+//            overflow = TextOverflow.Ellipsis
+//        )
+//
+//        MediaPlayerSlider(
+//            modifier = Modifier
+//                .padding(8.dp)
+//                .fillMaxWidth()
+//                .wrapContentHeight(),
+//            duration = viewModel.duration,
+//            onValueChanged = { newPosition ->
+//                viewModel.onSliderChange(newPosition)
+//            },
+//            currentPosition = viewModel.currentPosition
+//        )
+//
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .wrapContentHeight(),
+//            horizontalArrangement = Arrangement.SpaceBetween
+//        ) {
+//            IconButton(onClick = { viewModel.shuffleStateChange() }) {
+//                Icon(
+//                    contentDescription = null,
+//                    imageVector =
+//                    if (viewModel.isShuffleModeSet) Icons.Default.ShuffleOn else Icons.Default.Shuffle,
+//                    tint = MaterialTheme.colorScheme.onBackground
+//                )
+//            }
+//            IconButton(onClick = { viewModel.previousTrack() }) {
+//                Icon(
+//                    Icons.Default.SkipPrevious,
+//                    "Previous",
+//                    modifier = Modifier.size(80.dp),
+//                    tint = MaterialTheme.colorScheme.onBackground
+//                )
+//            }
+//
+//            IconButton(onClick = {
+//                viewModel.playPauseChange()
+//            }) {
+//                Icon(
+//                    if (viewModel.isTrackPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+//                    if (viewModel.isTrackPlaying) "Pause" else "Play",
+//                    modifier = Modifier.size(80.dp),
+//                    tint = MaterialTheme.colorScheme.onBackground
+//                )
+//            }
+//            IconButton(onClick = { viewModel.nextTrack() }) {
+//                Icon(
+//                    Icons.Default.SkipNext,
+//                    "Next",
+//                    modifier = Modifier.size(80.dp),
+//                    tint = MaterialTheme.colorScheme.onBackground
+//                )
+//            }
+//            IconButton(onClick = { viewModel.isRepeatingOneStateChange() }) {
+//                Icon(
+//                    contentDescription = null,
+//                    imageVector = if (viewModel.isRepeatingOne) Icons.Default.RepeatOne else Icons.Default.Repeat,
+//                    tint = MaterialTheme.colorScheme.onBackground
+//                )
+//            }
+//        }
+//    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
