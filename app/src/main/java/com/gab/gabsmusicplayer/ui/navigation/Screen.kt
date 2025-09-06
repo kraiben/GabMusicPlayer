@@ -1,9 +1,7 @@
 package com.gab.gabsmusicplayer.ui.navigation
 
+//import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistChangesScreenMode
 import android.net.Uri
-import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistChangesScreenMode
-import com.gab.core_music_loading.models.PlaylistInfoModel
-import com.google.gson.Gson
 
 sealed class Screen(val route: String) {
 
@@ -16,12 +14,12 @@ sealed class Screen(val route: String) {
     data object PlaylistEditOrAddScreen : Screen(ROUTE_PLAYLIST_EDIT_OR_ADD_SCREEN) {
         private const val ROUTE_FOR_ARGS = "playlist_edit_or_ad"
 
-        fun getRouteWithArgs(playlist: PlaylistInfoModel, screenMode: PlaylistChangesScreenMode):
-                String {
-            val playlistJson = playlist.toJson().encode()
-            val screenModeJson = Gson().toJson(screenMode).encode()
-            return "$ROUTE_FOR_ARGS/${playlistJson}/${screenModeJson}"
-        }
+//        fun getRouteWithArgs(playlist: PlaylistInfoModel, screenMode: PlaylistChangesScreenMode):
+//                String {
+//            val playlistJson = playlist.toJson().encode()
+//            val screenModeJson = Gson().toJson(screenMode).encode()
+//            return "$ROUTE_FOR_ARGS/${playlistJson}/${screenModeJson}"
+//        }
     }
 
     data object SinglePlaylistScreen : Screen(ROUTE_SINGLE_PLAYLIST_SCREEN) {

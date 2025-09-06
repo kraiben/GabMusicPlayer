@@ -8,11 +8,9 @@ import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.ProductFlavor
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.accessors.dm.LibrariesForLibs
-import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.the
 

@@ -4,8 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistChangesScreenMode
-import com.gab.core_music_loading.models.PlaylistInfoModel
 
 @Composable
 fun MusicNavGraph(
@@ -13,22 +11,23 @@ fun MusicNavGraph(
     allTracksScreenContent: @Composable () -> Unit,
     allPlaylistsGridContent: @Composable () -> Unit,
     playlistScreenContent: @Composable (Long) -> Unit,
-    playlistEditOrAddScreenContent: @Composable (PlaylistInfoModel, PlaylistChangesScreenMode) -> Unit
+//    playlistEditOrAddScreenContent: @Composable (PlaylistInfoModel, PlaylistChangesScreenMode) -> Unit
 ) {
     NavHost(
         navController = navHostController,
 //        startDestination = Screen.Playlist.route
         startDestination = Screen.AllTracksScreen.route
     ) {
+
         composable(
             route = Screen.AllTracksScreen.route
         ) {
             allTracksScreenContent()
         }
-        playlistNavGraph(
-            allPlaylistsGridContent = allPlaylistsGridContent,
-            playlistScreenContent = playlistScreenContent,
-            playlistEditOrAddScreenContent = playlistEditOrAddScreenContent
-        )
+//        playlistNavGraph(
+//            allPlaylistsGridContent = allPlaylistsGridContent,
+//            playlistScreenContent = playlistScreenContent,
+//            playlistEditOrAddScreenContent = playlistEditOrAddScreenContent
+//        )
     }
 }

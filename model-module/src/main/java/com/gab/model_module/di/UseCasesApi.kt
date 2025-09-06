@@ -8,8 +8,8 @@ import com.gab.model_module.usecases.CreatePlaylistUseCase
 import com.gab.model_module.usecases.DecrementDurationUseCase
 import com.gab.model_module.usecases.GetMinDurationInSecondsUseCase
 import com.gab.model_module.usecases.GetPlaylistsUseCase
-import com.gab.model_module.usecases.GetTracksUseCaseWithDurationFilter
-import com.gab.model_module.usecases.GetTracksUseCaseWithoutDurationFilter
+import com.gab.model_module.usecases.GetTracksWithoutDurationFilterUseCase
+import com.gab.model_module.usecases.GetTracksWithDurationFilterUseCase
 import com.gab.model_module.usecases.IncrementDurationUseCase
 import com.gab.model_module.usecases.IsDarkThemeChangeUseCase
 import com.gab.model_module.usecases.IsDarkThemeUseCase
@@ -28,8 +28,8 @@ public interface UseCasesApi {
     public fun getDecrementDurationUseCase(): DecrementDurationUseCase
     public fun getGetMinDurationInSecondsUseCase(): GetMinDurationInSecondsUseCase
     public fun getGetPlaylistsUseCase(): GetPlaylistsUseCase
-    public fun getGetTracksUseCaseWithDurationFilter(): GetTracksUseCaseWithDurationFilter
-    public fun getGetTracksUseCaseWithoutDurationFilter(): GetTracksUseCaseWithoutDurationFilter
+    public fun getGetTracksUseCaseWithDurationFilter(): GetTracksWithDurationFilterUseCase
+    public fun getGetTracksUseCaseWithoutDurationFilter(): GetTracksWithoutDurationFilterUseCase
     public fun getIncrementDurationUseCase(): IncrementDurationUseCase
     public fun getIsDarkThemeChangeUseCase(): IsDarkThemeChangeUseCase
     public fun getIsDarkThemeUseCase(): IsDarkThemeUseCase
