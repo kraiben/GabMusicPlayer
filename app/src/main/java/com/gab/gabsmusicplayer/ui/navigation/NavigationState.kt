@@ -5,7 +5,6 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-//import com.gab.gabsmusicplayer.ui.playlistScreens.PlaylistChangesScreenMode
 import com.gab.music_entities_module.PlaylistInfoModel
 
 class NavigationState(
@@ -18,7 +17,6 @@ class NavigationState(
             }
             restoreState = true
             launchSingleTop = true
-
         }
     }
 

@@ -1,4 +1,4 @@
-package com.gab.gabsmusicplayer.ui.general
+package com.gab.feature_playlists.ui.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SortChip(
+internal fun SortChip(
     sortParameter: SortParameter,
     sortOrderState: SortOrderState,
     onClick: () -> Unit,

@@ -1,12 +1,10 @@
 package com.gab.feature_all_tracks.di
 
-import com.gab.feature_all_tracks.holder.AllTracksFeatureHolderImpl
 import dagger.Component
 
 @AllTracksFeatureScope
 @Component(dependencies = [AllTracksFeatureDependencies::class], modules = [AllTracksFeatureModule::class])
 public interface AllTracksFeatureComponent: AllTracksFeatureComponentApi {
-    public fun inject(holder: AllTracksFeatureHolderImpl)
     @Component.Factory
     public interface Factory {
         public fun create(deps: AllTracksFeatureDependencies): AllTracksFeatureComponent

@@ -26,6 +26,9 @@ public data class PlaylistInfoModel(
             Date()
         )
 
+        public fun fromJson(str: String): PlaylistInfoModel {
+            return gson.fromJson(str, PlaylistInfoModel::class.java)
+        }
         private object UriTypeAdapter : TypeAdapter<Uri>() {
             override fun write(out: JsonWriter, value: Uri) {
                 out.value(value.toString())
@@ -49,8 +52,5 @@ public data class PlaylistInfoModel(
             .registerTypeAdapter(Uri::class.java, UriTypeAdapter)
             .registerTypeAdapter(Date::class.java, DateTypeAdapter)
             .create()
-        public fun fromJson(str: String): PlaylistInfoModel {
-            return gson.fromJson(str, PlaylistInfoModel::class.java)
-        }
     }
 }

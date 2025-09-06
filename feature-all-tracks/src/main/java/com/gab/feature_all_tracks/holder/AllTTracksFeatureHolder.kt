@@ -15,5 +15,5 @@ public interface AllTTracksFeatureHolder {
         trackOptionsMenuContent: @Composable ((track: TrackInfoModel, onDismiss: () -> Unit) -> Unit)
     )
 
-    public fun navigateToAllTracksScreen(navHostController: NavHostController)
+//    public fun navigateToAllTracksScreen(navHostController: NavHostController)
     public fun getAllTracksScreenRoute(): String}

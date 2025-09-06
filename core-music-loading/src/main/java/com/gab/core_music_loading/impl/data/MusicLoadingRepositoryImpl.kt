@@ -11,8 +11,8 @@ import com.gab.core_music_loading.GAB_CHECK
 import com.gab.core_music_loading.R
 import com.gab.core_music_loading.api.data.MusicLoadingRepository
 import com.gab.core_music_loading.mergeWith
-import com.gab.music_entities_module.TrackInfoModel
 import com.gab.music_entities_module.PlaylistInfoModel
+import com.gab.music_entities_module.TrackInfoModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
-import kotlin.collections.plus
 import kotlin.system.measureTimeMillis
 
 internal class MusicLoadingRepositoryImpl @Inject constructor(

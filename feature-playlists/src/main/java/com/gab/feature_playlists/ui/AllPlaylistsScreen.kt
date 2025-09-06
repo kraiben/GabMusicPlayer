@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,38 +28,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.gab.gabsmusicplayer.ui.general.LoadingCircle
-import com.gab.gabsmusicplayer.ui.navigation.NavigationState
+import com.gab.feature_playlists.ui.components.LoadingCircle
+import com.gab.feature_playlists.ui.components.PlaylistsScreenState
 
 @Composable
-fun AllPlaylistsScreen(
-    paddingValues: PaddingValues,
-    navigationState: NavigationState,
-    playlistsState: PlaylistScreenState,
-    onCreateNewPlaylist: () -> Unit,
+internal fun AllPlaylistsScreen(
+    modifier: Modifier = Modifier,
+    viewModelFactory: ViewModelProvider.Factory,
+    navigateToPlaylist: (Long) -> Unit,
+    onCreateNewPlaylistScreenNavigate: () -> Unit,
 ) {
-    when (playlistsState) {
-        PlaylistScreenState.Initial -> {
+    val viewModel = viewModel<PlaylistsFeatureViewModel>(factory = viewModelFactory)
+    val _playlistsScreenState = viewModel.getPlaylists().collectAsState()
+
+    when (val playlistsScreenState = _playlistsScreenState.value) {
+        PlaylistsScreenState.Initial -> {
+        }
+        PlaylistsScreenState.Loading -> {
             LoadingCircle()
         }
-        PlaylistScreenState.Loading -> {
-            LoadingCircle()
-        }
-        is PlaylistScreenState.Playlists -> {
+        is PlaylistsScreenState.Playlists -> {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
+                modifier = modifier
                     .padding(4.dp)
             ) {
-                items(items = playlistsState.playlists, key = { it.id }) { playlist ->
+                items(items = playlistsScreenState.playlists, key = { it.id }) { playlist ->
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .clickable { navigationState.navigateToPlaylist(playlist.id) }
+                            .clickable { navigateToPlaylist(playlist.id) }
                             .padding(horizontal = 4.dp)
                             .background(color = MaterialTheme.colorScheme.background)
                             .aspectRatio(0.75F)
@@ -92,7 +94,7 @@ fun AllPlaylistsScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .clickable { onCreateNewPlaylist() }
+                            .clickable { onCreateNewPlaylistScreenNavigate() }
                             .padding(horizontal = 4.dp)
                             .background(color = MaterialTheme.colorScheme.background)
                             .aspectRatio(0.75F)

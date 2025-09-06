@@ -47,8 +47,8 @@
 //import androidx.navigation.NavDestination.Companion.hierarchy
 //import androidx.navigation.compose.currentBackStackEntryAsState
 //import com.gab.gabsmusicplayer.ui.general.MiniPlayer
-//import com.gab.gabsmusicplayer.ui.general.tracksList.TrackOptionsMenu
-//import com.gab.gabsmusicplayer.ui.general.tracksList.TrackOptionsMenuState
+//import com.gab.feature_options_menus.TrackOptionsMenu
+//import com.gab.feature_options_menus.TrackOptionsMenuState
 //import com.gab.gabsmusicplayer.ui.musicPlayerScreen.MusicPlayerScreen
 //import com.gab.gabsmusicplayer.ui.navigation.MusicNavGraph
 //import com.gab.gabsmusicplayer.ui.navigation.NavigationItem

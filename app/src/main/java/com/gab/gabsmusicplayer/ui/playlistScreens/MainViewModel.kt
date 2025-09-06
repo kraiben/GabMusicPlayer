@@ -7,8 +7,8 @@ import com.gab.model_module.usecases.CreatePlaylistUseCase
 import com.gab.model_module.usecases.DecrementDurationUseCase
 import com.gab.model_module.usecases.GetMinDurationInSecondsUseCase
 import com.gab.model_module.usecases.GetPlaylistsUseCase
+import com.gab.model_module.usecases.GetTracksWithoutDurationFilterUseCase
 import com.gab.model_module.usecases.GetTracksWithDurationFilterUseCase
-import com.gab.model_module.usecases.GetTracksUseCaseWithoutDurationFilter
 import com.gab.model_module.usecases.IncrementDurationUseCase
 import com.gab.model_module.usecases.IsDarkThemeChangeUseCase
 import com.gab.model_module.usecases.IsDarkThemeUseCase
@@ -27,7 +27,7 @@ class MainViewModel @Inject constructor(
     private val removePlaylistUseCase: RemovePlaylistUseCase,
     private val setPlaylistPictureUseCase: SetPlaylistPictureUseCase,
     private val getTracksWithDurationFilterUseCase: GetTracksWithDurationFilterUseCase,
-    private val getTracksUseCaseWithoutDurationFilter: GetTracksUseCaseWithoutDurationFilter,
+    private val getTracksWithoutDurationFilterUseCase: GetTracksWithoutDurationFilterUseCase,
     private val getMinDurationFlowUseCase: GetMinDurationInSecondsUseCase,
     private val incrementDurationUseCase: IncrementDurationUseCase,
     private val decrementDurationUseCase: DecrementDurationUseCase,

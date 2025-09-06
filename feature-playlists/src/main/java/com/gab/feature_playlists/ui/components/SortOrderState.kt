@@ -1,6 +1,6 @@
-package com.gab.gabsmusicplayer.ui.general
+package com.gab.feature_playlists.ui.components
 
-data class SortOrderState(
+internal data class SortOrderState(
     val order: SortOder = SortOder.Asc,
     val parameter: SortParameter = SortParameter.Date,
 ) {
@@ -14,10 +14,10 @@ data class SortOrderState(
     }
 }
 
-enum class SortOder {
+internal enum class SortOder {
     Asc, Desc;
 }
 
-enum class SortParameter(val orderBy: String) {
+internal enum class SortParameter(val orderBy: String) {
     Date("Дата"), Title("Название");
 }

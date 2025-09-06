@@ -1,7 +1,21 @@
 package com.gab.gabsmusicplayer.di
 
 import com.gab.model_media_usecases.di.ModelMediaUseCasesComponent
-import com.gab.model_media_usecases.usecases_api.*
+import com.gab.model_media_usecases.usecases_api.ChangePositionUseCase
+import com.gab.model_media_usecases.usecases_api.GetCurrentPositionFlowUseCase
+import com.gab.model_media_usecases.usecases_api.GetCurrentTrackInfoFlowUseCase
+import com.gab.model_media_usecases.usecases_api.GetIsRepeatingOneFlowUseCase
+import com.gab.model_media_usecases.usecases_api.GetIsShuffleModeSetFlowUseCase
+import com.gab.model_media_usecases.usecases_api.GetIsTrackPlayingFlowUseCase
+import com.gab.model_media_usecases.usecases_api.IsInitializedUseCase
+import com.gab.model_media_usecases.usecases_api.IsRepeatingOneStateChangeUseCase
+import com.gab.model_media_usecases.usecases_api.NextTrackUseCase
+import com.gab.model_media_usecases.usecases_api.PlayPauseStatusChangeUseCase
+import com.gab.model_media_usecases.usecases_api.PreviousTrackUseCase
+import com.gab.model_media_usecases.usecases_api.SetNextTrackUseCase
+import com.gab.model_media_usecases.usecases_api.SetRandomTrackQueueUseCase
+import com.gab.model_media_usecases.usecases_api.SetTrackQueueUseCase
+import com.gab.model_media_usecases.usecases_api.ShuffleStateChangeUseCase
 import dagger.Module
 import dagger.Provides
 

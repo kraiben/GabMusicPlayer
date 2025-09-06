@@ -2,8 +2,8 @@ package com.gab.model_module.usecasesImpl
 
 import android.net.Uri
 import com.gab.core_music_loading.api.data.MusicLoadingRepository
-import com.gab.music_entities_module.TrackInfoModel
 import com.gab.model_module.usecases.CreatePlaylistUseCase
+import com.gab.music_entities_module.TrackInfoModel
 import javax.inject.Inject
 
 public class CreatePlaylistUseCaseImpl @Inject constructor(private val repository: MusicLoadingRepository) :

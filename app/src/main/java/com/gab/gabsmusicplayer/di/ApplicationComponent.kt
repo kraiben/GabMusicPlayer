@@ -7,6 +7,8 @@ import com.gab.core_media.di.CoreMediaDependencies
 import com.gab.core_music_loading.impl.di.CoreMusicLoadingDependencies
 import com.gab.core_settings.impl.di.CoreSettingsDependencies
 import com.gab.feature_all_tracks.di.AllTracksFeatureDependencies
+import com.gab.feature_options_menus.di.TrackOptionsMenuDependencies
+import com.gab.feature_playlists.di.FeaturePlaylistDependencies
 import com.gab.gabsmusicplayer.di.view_model.ViewModelModule
 import com.gab.gabsmusicplayer.ui.general.MainActivity
 import com.gab.model_media_usecases.di.ModelMediaUseCasesDependencies
@@ -30,7 +32,9 @@ interface ApplicationComponent :
     UseCasesDependencies,
     CoreMediaDependencies,
     ModelMediaUseCasesDependencies,
-    AllTracksFeatureDependencies
+    AllTracksFeatureDependencies,
+    TrackOptionsMenuDependencies,
+    FeaturePlaylistDependencies
 {
 
     override val dataStore: DataStore<Preferences>

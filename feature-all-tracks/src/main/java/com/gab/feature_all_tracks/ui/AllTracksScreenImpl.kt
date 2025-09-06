@@ -1,5 +1,6 @@
 package com.gab.feature_all_tracks.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -44,7 +46,6 @@ internal fun AllTracksScreenImpl(
     trackAddedToQueryMessage: (String) -> Unit,
     viewModelFactory: ViewModelProvider.Factory,
 ) {
-    GAB_CHECK("AAAAAAAAAAAAAAAAAAAAAAAAA")
     val viewModel = viewModel<AllTracksViewModel>(factory = viewModelFactory)
     val screenState = viewModel.getTracks().collectAsState(AllTracksScreenState.Initial)
     when (val tracksState = screenState.value) {
@@ -58,14 +59,21 @@ internal fun AllTracksScreenImpl(
                     .height(60.dp)
             }
             var sortState by remember { mutableStateOf<SortParameter?>(null) }
+            val sortedTracks = remember(sortState, tracksState.tracks) {
+                when (sortState) {
+                    SortParameter.Date -> tracksState.tracks.sortedByDescending{it.dateAdded}
+                    SortParameter.Title -> tracksState.tracks.sortedBy { it.title }
+                    null -> tracksState.tracks.sortedBy { it.id }
+                }
+            }
 
             var currentOpenedMenuTrack by remember { mutableStateOf<TrackInfoModel?>(null) }
             val openTrackOptionsMenu =
                 remember { { t: TrackInfoModel -> currentOpenedMenuTrack = t } }
-            val setTracksQueue = remember {
-                { index: Int ->
+            val setTracksQueue = remember() {
+                { index: Int, tracks: List<TrackInfoModel> ->
                     viewModel.setTrackQueue(
-                        tracksState.tracks,
+                        tracks,
                         index
                     )
                 }
@@ -73,7 +81,7 @@ internal fun AllTracksScreenImpl(
             val setNextTrack = remember { { t: TrackInfoModel -> viewModel.setNextTrack(t) } }
             Box() {
                 LazyColumn(
-                    modifier = modifier
+                    modifier = modifier.background(color = MaterialTheme.colorScheme.background)
                 ) {
                     item {
                         Row(
@@ -123,11 +131,7 @@ internal fun AllTracksScreenImpl(
                         )
                     }
                     itemsIndexed(
-                        items = when (sortState) {
-                            SortParameter.Date -> tracksState.tracks.sortedBy{it.dateAdded}
-                            SortParameter.Title -> tracksState.tracks.sortedBy { it.title }
-                            null -> tracksState.tracks.sortedBy { it.id }
-                        },
+                        items = sortedTracks,
                         key = { index: Int, t: TrackInfoModel -> t.id },
                     ) { index: Int, t: TrackInfoModel ->
                         TrackListElement(
@@ -135,7 +139,7 @@ internal fun AllTracksScreenImpl(
                             modifier = trackListElementModifier
                                 .combinedClickable(
                                     onClick = {
-                                        setTracksQueue(index)
+                                        setTracksQueue(index, sortedTracks)
                                     },
                                     onLongClick = {
                                         trackAddedToQueryMessage("Добавлено в очередь")
@@ -152,12 +156,15 @@ internal fun AllTracksScreenImpl(
                 }
                 currentOpenedMenuTrack?.let {
                     trackOptionsMenuContent(it) {
+                        GAB_CHECK("onDismiss options menu")
                         currentOpenedMenuTrack = null
                     }
                 }
             }
         }
-        else -> LoadingCircle()
+        else -> {
+            LoadingCircle()
+        }
     }
 }
 

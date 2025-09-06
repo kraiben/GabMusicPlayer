@@ -1,8 +1,8 @@
 package com.gab.core_music_loading.api.data
 
 import android.net.Uri
-import com.gab.music_entities_module.TrackInfoModel
 import com.gab.music_entities_module.PlaylistInfoModel
+import com.gab.music_entities_module.TrackInfoModel
 import kotlinx.coroutines.flow.StateFlow
 
 public interface MusicLoadingRepository {

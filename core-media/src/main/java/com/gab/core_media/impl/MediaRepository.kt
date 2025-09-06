@@ -22,21 +22,22 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.toString
 
 public class MediaRepository @Inject constructor(
-    private val mediaController: MediaController,
+    private val mediaControllerInitializer: MediaControllerInitializer,
+//    private val mediaController: MediaController,
 ) : MediaPlayerRepository, TracksListRepository {
-//    private var mediaController: MediaController? = null
-    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private var mediaController: MediaController? = null
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val _currentMediaItem = MutableSharedFlow<MediaItem>()
     private var currentMediaItem: StateFlow<MediaItem> = flow {
         _currentMediaItem.collect { emit(it) }
     }.stateIn(
         coroutineScope,
         SharingStarted.Lazily,
-        mediaController.currentMediaItem ?: MediaItem.EMPTY
+        mediaController?.currentMediaItem ?: MediaItem.EMPTY
     )
     private val _isTrackPlaying = MutableSharedFlow<Boolean>()
     private var isTrackPlaying: StateFlow<Boolean> = flow {
@@ -60,7 +61,7 @@ public class MediaRepository @Inject constructor(
     }.stateIn(
         coroutineScope,
         SharingStarted.Lazily,
-        mediaController.repeatMode == Player.REPEAT_MODE_ONE
+        mediaController?.repeatMode == Player.REPEAT_MODE_ONE
     )
     private val _isShuffleModeSet = MutableSharedFlow<Boolean>()
     private var isShuffleModeSet: StateFlow<Boolean> = flow {
@@ -103,12 +104,13 @@ public class MediaRepository @Inject constructor(
 
     private val queryExt = mutableListOf<TrackInfoModel>()
 
-    public override suspend fun setNextTrack(track: TrackInfoModel) {
+    public override suspend fun setNextTrack(track: TrackInfoModel): Unit = withContext(Dispatchers.Main){
 
-        if (mediaController.currentMediaItem?.mediaId == track.id.toString()) return
+        if (mediaController?.currentMediaItem?.mediaId == track.id.toString()) return@withContext
         queryExt.add(0, track)
-        if (mediaController.shuffleModeEnabled) mediaController.shuffleModeEnabled = false
-        mediaController.moveTrackToStartOfQuery(track)
+        if (mediaController?.shuffleModeEnabled ?: false) mediaController?.shuffleModeEnabled =
+            false
+        mediaController?.moveTrackToStartOfQuery(track)
 
     }
 
@@ -116,7 +118,7 @@ public class MediaRepository @Inject constructor(
         override fun onRepeatModeChanged(repeatMode: Int) {
             super.onRepeatModeChanged(repeatMode)
             coroutineScope.launch {
-                _isRepeatingOne.emit(mediaController.repeatMode == Player.REPEAT_MODE_ONE)
+                _isRepeatingOne.emit(mediaController?.repeatMode == Player.REPEAT_MODE_ONE)
             }
         }
 
@@ -146,7 +148,7 @@ public class MediaRepository @Inject constructor(
         override fun onIsLoadingChanged(isLoading: Boolean) {
             super.onIsLoadingChanged(isLoading)
             coroutineScope.launch {
-                _currentMediaItem.emit(mediaController.currentMediaItem ?: MediaItem.EMPTY)
+                _currentMediaItem.emit(mediaController?.currentMediaItem ?: MediaItem.EMPTY)
                 currentTrackUpdateReceiver.emit(currentMediaItem.value.mediaMetadata)
             }
         }
@@ -154,10 +156,10 @@ public class MediaRepository @Inject constructor(
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
             coroutineScope.launch {
-                _currentMediaItem.emit(mediaController.currentMediaItem ?: MediaItem.EMPTY)
+                _currentMediaItem.emit(mediaController?.currentMediaItem ?: MediaItem.EMPTY)
                 currentTrackUpdateReceiver.emit(currentMediaItem.value.mediaMetadata)
             }
-            mediaController.let { mc ->
+            mediaController?.let { mc ->
                 if (queryExt.isEmpty()) {
                     mc.shuffleModeEnabled = isShuffleModeSet.value
                 } else {
@@ -178,79 +180,97 @@ public class MediaRepository @Inject constructor(
 
     override fun getIsTrackPlayingFlow(): StateFlow<Boolean> = isTrackPlaying
 
-    override suspend fun playPauseStatusChange() {playPauseChange()}
-
-    public override suspend fun nextTrack() {
-        mediaController.seekToNext()
+    override suspend fun playPauseStatusChange(): Unit = withContext(Dispatchers.Main) {
+        playPauseChange()
     }
 
-    public override suspend fun previousTrack() {
-        mediaController.seekToPrevious()
+    public override suspend fun nextTrack(): Unit = withContext(Dispatchers.Main) {
+        mediaController?.seekToNext()
     }
+
+    public override suspend fun previousTrack(): Unit = withContext(Dispatchers.Main) {
+        mediaController?.seekToPrevious()
+    }
+
     public fun playPauseChange() {
-        if (isTrackPlaying.value) mediaController.pause()
-        else mediaController.play()
+        if (isTrackPlaying.value) mediaController?.pause()
+        else mediaController?.play()
     }
 
-    public override suspend fun changePosition(position: Long): Unit =
-        mediaController.seekTo(position)
+    public override suspend fun changePosition(position: Long): Unit = withContext(Dispatchers.Main) {
+        mediaController?.seekTo(position) ?: Unit
+    }
 
-    public override suspend fun shuffleStateChange() {
+    public override suspend fun shuffleStateChange(): Unit = withContext(Dispatchers.Main) {
         if (queryExt.isNotEmpty()) {
             coroutineScope.launch {
                 _isShuffleModeSet.emit(!isShuffleModeSet.value)
             }
         } else {
-            mediaController.shuffleModeEnabled = !(mediaController.shuffleModeEnabled)
+            mediaController?.shuffleModeEnabled = !(mediaController?.shuffleModeEnabled ?: false)
         }
     }
 
-    public override suspend fun isRepeatingOneStateChange(): Unit = if (isRepeatingOne.value) {
-        mediaController.repeatMode = Player.REPEAT_MODE_ALL
-    } else mediaController.repeatMode = Player.REPEAT_MODE_ONE
+    public override suspend fun isRepeatingOneStateChange(): Unit = withContext(Dispatchers.Main){
+        if (isRepeatingOne.value) {
+            mediaController?.repeatMode = Player.REPEAT_MODE_ALL
+        } else {
+            mediaController?.repeatMode = Player.REPEAT_MODE_ONE
+        }
+    }
 
     public override suspend fun setTrackQueue(
         tracks: List<TrackInfoModel>,
         startIndex: Int?,
         isShuffledModMustBeSet: Boolean,
-    ) {
-        if (mediaController.currentMediaItem == null) {
-
-            return initializePlayer(
+    ): Unit = withContext(Dispatchers.Main) {
+        if (mediaController == null) {
+            return@withContext initializePlayer(
                 tracks = tracks,
                 startIndex = startIndex,
                 isShuffled = isShuffledModMustBeSet
             )
         }
         if (isShuffledModMustBeSet) {
-            mediaController.setPlaylist(tracks, isShuffled = true)
+            mediaController?.setPlaylist(tracks, isShuffled = true)
             queryExt.clear()
-            return
+            return@withContext
         }
-        if (mediaController.currentMediaItem?.mediaMetadata?.title != tracks[startIndex ?: 0].title) {
+        if (mediaController?.currentMediaItem?.mediaMetadata?.title != tracks[startIndex
+                ?: 0].title
+        ) {
             queryExt.clear()
-            mediaController.setPlaylist(tracks, startIndex, isShuffled = isShuffleModeSet.value)
+            mediaController?.setPlaylist(tracks, startIndex, isShuffled = isShuffleModeSet.value)
         }
     }
 
+    private val synchronizedKey = Any()
     private fun initializePlayer(
         tracks: List<TrackInfoModel>,
         startIndex: Int?,
         isShuffled: Boolean,
     ) {
-        with(mediaController) {
-            addListener(listener)
-            setPlaylist(tracks, startIndex, isShuffled)
-            shuffleModeEnabled = isShuffled
+        synchronized(synchronizedKey) {
+            if (mediaController == null) {
+                mediaControllerInitializer.initializePlayer(
+                    { controllerFuture ->
+                        mediaController = controllerFuture.get().also {
+                            it.addListener(listener)
+                            it.setPlaylist(tracks, startIndex, isShuffled)
+                            it.shuffleModeEnabled = isShuffled
+                            startPositionUpdates()
+                        }
+                    }
+                )
+            }
         }
-        startPositionUpdates()
     }
 
     private fun startPositionUpdates() {
         coroutineScope.launch {
             while (isActive) {
                 delay(250)
-                _currentPosition.emit(mediaController.currentPosition)
+                _currentPosition.emit(mediaController?.currentPosition ?: 0L)
             }
             GAB_CHECK("startPositionUpdates no more active")
         }

@@ -1,4 +1,4 @@
-package com.gab.feature_playlists.ui
+package com.gab.feature_playlists.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder

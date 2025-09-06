@@ -9,6 +9,6 @@ android {
 
 dependencies {
     implementation(projects.coreMusicLoading)
-    implementation(projects.musicEntitiesModule)
     implementation(projects.coreSettings)
+    implementation(projects.musicEntitiesModule)
 }

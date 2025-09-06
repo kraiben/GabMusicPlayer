@@ -1,7 +1,7 @@
 package com.gab.model_media_usecases.usecases_Impl
 
 import com.gab.core_media.api.MediaPlayerRepository
-import com.gab.model_media_usecases.usecases_api.*
+import com.gab.model_media_usecases.usecases_api.ChangePositionUseCase
 import javax.inject.Inject
 
 public class ChangePositionUseCaseImpl @Inject constructor(private val repository: MediaPlayerRepository) :
