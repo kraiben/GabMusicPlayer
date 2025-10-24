@@ -55,4 +55,3 @@ public interface CoreMusicLoadingDependenciesProvider {
 public object CoreMusicLoadingDependenciesStore: CoreMusicLoadingDependenciesProvider {
     override var deps: CoreMusicLoadingDependencies by notNull()
 }
-

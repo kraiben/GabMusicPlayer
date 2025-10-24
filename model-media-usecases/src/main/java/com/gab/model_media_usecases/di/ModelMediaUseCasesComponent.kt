@@ -2,6 +2,7 @@ package com.gab.model_media_usecases.di
 
 import dagger.Component
 
+@ModelMediaUseCasesScope
 @Component(modules = [ModelMediaUseCasesModule::class], dependencies = [ModelMediaUseCasesDependencies::class])
 public interface ModelMediaUseCasesComponent: ModelMediaUseCasesApi {
 

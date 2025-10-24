@@ -27,13 +27,20 @@
             <option value="$PROJECT_DIR$/core-music-loading" />
             <option value="$PROJECT_DIR$/core-settings" />
             <option value="$PROJECT_DIR$/feature-all-tracks" />
+            <option value="$PROJECT_DIR$/feature-api-all-tracks" />
+            <option value="$PROJECT_DIR$/feature-api-options-menus" />
+            <option value="$PROJECT_DIR$/feature-api-player" />
+            <option value="$PROJECT_DIR$/feature-api-playlists" />
             <option value="$PROJECT_DIR$/feature-options-menus" />
+            <option value="$PROJECT_DIR$/feature-player" />
             <option value="$PROJECT_DIR$/feature-playlists" />
-            <option value="$PROJECT_DIR$/injection-module" />
             <option value="$PROJECT_DIR$/model-media-usecases" />
             <option value="$PROJECT_DIR$/model-module" />
             <option value="$PROJECT_DIR$/music-entities-module" />
+            <option value="$PROJECT_DIR$/navigation-module" />
             <option value="$PROJECT_DIR$/testapp" />
+            <option value="$PROJECT_DIR$/theme-api-module" />
+            <option value="$PROJECT_DIR$/theme-module" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -11,5 +11,7 @@ android {
 dependencies {
     implementation(projects.musicEntitiesModule)
     implementation(projects.modelMediaUsecases)
+    implementation(projects.featureApiOptionsMenus)
+    implementation(projects.featureApiAllTracks)
     implementation(projects.modelModule)
 }

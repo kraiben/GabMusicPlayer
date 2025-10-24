@@ -13,5 +13,7 @@ dependencies {
     implementation(projects.musicEntitiesModule)
     implementation(projects.modelMediaUsecases)
     implementation(projects.modelModule)
+    implementation(projects.featureApiOptionsMenus)
+    implementation(projects.featureApiPlaylists)
     implementation(libs.accompanist.permissions)
 }

@@ -1,9 +1,11 @@
 package com.gab.feature_playlists.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.gab.music_entities_module.PlaylistInfoModel
@@ -21,7 +23,10 @@ internal fun NavGraphBuilder.playlistNavGraph(
         composable(route = Screen.AllPlaylistsScreen.route) {
             allPlaylistsGridContent()
         }
-        composable(
+        dialog(
+            dialogProperties = DialogProperties(
+                usePlatformDefaultWidth = false
+            ),
             route = Screen.PlaylistEditOrAddScreen.route,
             arguments = listOf(
                 navArgument(Screen.KEY_PLAYLIST_EDIT_OR_ADD) {

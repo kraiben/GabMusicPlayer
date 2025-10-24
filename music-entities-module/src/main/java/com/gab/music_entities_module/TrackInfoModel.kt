@@ -26,7 +26,7 @@ public data class TrackInfoModel(
             path = "",
             duration = 0L,
             albumArtUri = Uri.EMPTY,
-            albumArtUriIsNullPatchId = 0
+            albumArtUriIsNullPatchId = R.drawable.gpic_46
         )
     }
 }

@@ -1,28 +1,25 @@
 package com.gab.feature_all_tracks.holder
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.gab.feature_all_tracks.GAB_CHECK
 import com.gab.feature_all_tracks.ui.AllTracksScreenImpl
-import com.gab.music_entities_module.TrackInfoModel
+import com.gab.feature_api_all_tracks.AllTTracksFeatureHolder
+import com.gab.feature_api_options_menus.AllTracksScreenOptionsMenuHolder
 import javax.inject.Inject
-
 
 public class AllTracksFeatureHolderImpl
 @Inject constructor(
     private val viewModelFactory: ViewModelProvider.Factory,
+    private val trackOptionsMenuHolder: AllTracksScreenOptionsMenuHolder,
 ) : AllTTracksFeatureHolder {
 
     override fun NavGraphBuilder.allTracksScreen(
         modifier: Modifier,
         onMenuButtonClick: () -> Unit,
         trackAddedToQueryMessage: (String) -> Unit,
-        trackOptionsMenuContent: @Composable ((track: TrackInfoModel, onDismiss: () -> Unit) -> Unit),
     ) {
         composable(
             route = ROUTE_ALL_TRACKS_SCREEN
@@ -30,8 +27,8 @@ public class AllTracksFeatureHolderImpl
             GAB_CHECK("adkbvg")
             AllTracksScreenImpl(
                 modifier,
+                trackOptionsMenuHolder,
                 onMenuButtonClick,
-                trackOptionsMenuContent,
                 trackAddedToQueryMessage,
                 viewModelFactory
             )

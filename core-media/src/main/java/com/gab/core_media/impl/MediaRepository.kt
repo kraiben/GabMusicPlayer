@@ -8,6 +8,7 @@ import androidx.media3.session.MediaController
 import com.gab.core_media.GAB_CHECK
 import com.gab.core_media.api.MediaPlayerRepository
 import com.gab.core_media.api.TracksListRepository
+import com.gab.core_media.di.MediaScope
 import com.gab.core_media.moveTrackToStartOfQuery
 import com.gab.core_media.setPlaylist
 import com.gab.music_entities_module.TrackInfoModel
@@ -16,19 +17,25 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@MediaScope
 public class MediaRepository @Inject constructor(
     private val mediaControllerInitializer: MediaControllerInitializer,
-//    private val mediaController: MediaController,
 ) : MediaPlayerRepository, TracksListRepository {
+    init {
+        GAB_CHECK("MediaRepository init")
+    }
+
     private var mediaController: MediaController? = null
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val _currentMediaItem = MutableSharedFlow<MediaItem>()
@@ -72,17 +79,19 @@ public class MediaRepository @Inject constructor(
         false
     )
 
-    private val currentTrackUpdateReceiver = MutableSharedFlow<MediaMetadata>(replay = 1)
+    private val currentTrackUpdateReceiver = MutableSharedFlow<MediaMetadata>()
     private val currentTrack = flow<TrackInfoModel> {
-        currentTrackUpdateReceiver.collect {
+        _currentMediaItem.collect {
+//        currentTrackUpdateReceiver.collect {
             emit(
+
                 TrackInfoModel(
-                    id = -1,
-                    title = it.title.toString(),
-                    artist = it.artist.toString(),
-                    duration = it.durationMs ?: 0L,
-                    albumArtUriIsNullPatchId = it.artworkDataType ?: 0,
-                    albumArtUri = it.artworkUri ?: Uri.EMPTY,
+                    id = 0,
+                    title = it.mediaMetadata.title.toString(),
+                    artist = it.mediaMetadata.artist.toString(),
+                    duration = it.mediaMetadata.durationMs ?: 0L,
+                    albumArtUriIsNullPatchId = it.mediaMetadata.artworkDataType ?: 0,
+                    albumArtUri = it.mediaMetadata.artworkUri ?: Uri.EMPTY,
                     path = ""
                 )
             )
@@ -93,26 +102,56 @@ public class MediaRepository @Inject constructor(
         TrackInfoModel.EMPTY
     )
 
+    init {
+        coroutineScope.launch(Dispatchers.IO) {
+            currentTrack.collect {
+                GAB_CHECK(
+                    "title = ${it.title}\n" +
+                            "artist = ${it.artist}\n" +
+                            "duration = ${it.duration}\n" +
+                            "albumArtUriIsNullPatchId = ${it.albumArtUriIsNullPatchId}\n" +
+                            "albumArtUri = ${it.albumArtUri}\n" +
+                            "path = ${it.path}"
+                )
+            }
+        }
+    }
+
     override fun getCurrentTrackInfoFlow(): StateFlow<TrackInfoModel> = currentTrack
     override fun isInitialized(): StateFlow<Boolean> = flow {
-        currentTrack.collect { emit(it != TrackInfoModel.EMPTY) }
+        currentTrack.collect {
+            GAB_CHECK("currentTrack.collect: ${it != TrackInfoModel.EMPTY}")
+            emit(it != TrackInfoModel.EMPTY)
+        }
     }.stateIn(
         coroutineScope,
         SharingStarted.Lazily,
         false
     )
 
+    private val _newTracksQueueHasBeenSetNotifierFlow = MutableSharedFlow<Unit>()
+    private val newTracksQueueHasBeenSetNotifierFlow = flow<Unit> {
+        _newTracksQueueHasBeenSetNotifierFlow.collect {
+            emit(Unit)
+        }
+    }.shareIn(coroutineScope, SharingStarted.Lazily)
+
+
+    override fun getNewTracksQueueSettingNotifier(): SharedFlow<Unit> =
+        newTracksQueueHasBeenSetNotifierFlow
+
     private val queryExt = mutableListOf<TrackInfoModel>()
 
-    public override suspend fun setNextTrack(track: TrackInfoModel): Unit = withContext(Dispatchers.Main){
+    public override suspend fun setNextTrack(track: TrackInfoModel): Unit =
+        withContext(Dispatchers.Main) {
 
-        if (mediaController?.currentMediaItem?.mediaId == track.id.toString()) return@withContext
-        queryExt.add(0, track)
-        if (mediaController?.shuffleModeEnabled ?: false) mediaController?.shuffleModeEnabled =
-            false
-        mediaController?.moveTrackToStartOfQuery(track)
+            if (mediaController?.currentMediaItem?.mediaId == track.id.toString()) return@withContext
+            queryExt.add(0, track)
+            if (mediaController?.shuffleModeEnabled ?: false) mediaController?.shuffleModeEnabled =
+                false
+            mediaController?.moveTrackToStartOfQuery(track)
 
-    }
+        }
 
     private val listener = object : Player.Listener {
         override fun onRepeatModeChanged(repeatMode: Int) {
@@ -146,18 +185,17 @@ public class MediaRepository @Inject constructor(
         }
 
         override fun onIsLoadingChanged(isLoading: Boolean) {
-            super.onIsLoadingChanged(isLoading)
             coroutineScope.launch {
                 _currentMediaItem.emit(mediaController?.currentMediaItem ?: MediaItem.EMPTY)
                 currentTrackUpdateReceiver.emit(currentMediaItem.value.mediaMetadata)
             }
+            super.onIsLoadingChanged(isLoading)
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            super.onMediaItemTransition(mediaItem, reason)
             coroutineScope.launch {
                 _currentMediaItem.emit(mediaController?.currentMediaItem ?: MediaItem.EMPTY)
-                currentTrackUpdateReceiver.emit(currentMediaItem.value.mediaMetadata)
+                currentTrackUpdateReceiver.emit(mediaItem?.mediaMetadata ?: currentMediaItem.value.mediaMetadata)
             }
             mediaController?.let { mc ->
                 if (queryExt.isEmpty()) {
@@ -169,6 +207,7 @@ public class MediaRepository @Inject constructor(
                     }
                 }
             }
+            super.onMediaItemTransition(mediaItem, reason)
         }
     }
 
@@ -197,9 +236,10 @@ public class MediaRepository @Inject constructor(
         else mediaController?.play()
     }
 
-    public override suspend fun changePosition(position: Long): Unit = withContext(Dispatchers.Main) {
-        mediaController?.seekTo(position) ?: Unit
-    }
+    public override suspend fun changePosition(position: Long): Unit =
+        withContext(Dispatchers.Main) {
+            mediaController?.seekTo(position) ?: Unit
+        }
 
     public override suspend fun shuffleStateChange(): Unit = withContext(Dispatchers.Main) {
         if (queryExt.isNotEmpty()) {
@@ -211,7 +251,7 @@ public class MediaRepository @Inject constructor(
         }
     }
 
-    public override suspend fun isRepeatingOneStateChange(): Unit = withContext(Dispatchers.Main){
+    public override suspend fun isRepeatingOneStateChange(): Unit = withContext(Dispatchers.Main) {
         if (isRepeatingOne.value) {
             mediaController?.repeatMode = Player.REPEAT_MODE_ALL
         } else {
@@ -225,15 +265,18 @@ public class MediaRepository @Inject constructor(
         isShuffledModMustBeSet: Boolean,
     ): Unit = withContext(Dispatchers.Main) {
         if (mediaController == null) {
-            return@withContext initializePlayer(
+            initializePlayer(
                 tracks = tracks,
                 startIndex = startIndex,
                 isShuffled = isShuffledModMustBeSet
             )
+            _newTracksQueueHasBeenSetNotifierFlow.emit(Unit)
+            return@withContext
         }
         if (isShuffledModMustBeSet) {
             mediaController?.setPlaylist(tracks, isShuffled = true)
             queryExt.clear()
+            _newTracksQueueHasBeenSetNotifierFlow.emit(Unit)
             return@withContext
         }
         if (mediaController?.currentMediaItem?.mediaMetadata?.title != tracks[startIndex
@@ -242,6 +285,7 @@ public class MediaRepository @Inject constructor(
             queryExt.clear()
             mediaController?.setPlaylist(tracks, startIndex, isShuffled = isShuffleModeSet.value)
         }
+        _newTracksQueueHasBeenSetNotifierFlow.emit(Unit)
     }
 
     private val synchronizedKey = Any()

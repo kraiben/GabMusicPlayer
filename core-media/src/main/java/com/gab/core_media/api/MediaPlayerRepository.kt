@@ -1,6 +1,7 @@
 package com.gab.core_media.api
 
 import com.gab.music_entities_module.TrackInfoModel
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 public interface MediaPlayerRepository {
@@ -10,6 +11,7 @@ public interface MediaPlayerRepository {
     public fun getIsShuffleModeSetFlow(): StateFlow<Boolean>
     public fun getIsTrackPlayingFlow(): StateFlow<Boolean>
     public fun isInitialized(): StateFlow<Boolean>
+    public fun getNewTracksQueueSettingNotifier(): SharedFlow<Unit>
 
     public suspend fun nextTrack()
     public suspend fun previousTrack()

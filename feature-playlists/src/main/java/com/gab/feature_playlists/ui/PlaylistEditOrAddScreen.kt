@@ -3,6 +3,7 @@ package com.gab.feature_playlists.ui
 import android.Manifest
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,6 +43,7 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -86,6 +89,7 @@ internal fun PlaylistEditOrAddScreen(
     playlist: PlaylistInfoModel,
     screenMode: PlaylistChangesScreenMode,
     pictureSelectingErrorMsg: (String) -> Unit,
+    notUniquePlaylistNameErrorMessage: (String) -> Unit,
     onReturn: () -> Unit,
     onReturnAfterRemoving: () -> Unit,
 ) {
@@ -114,6 +118,14 @@ internal fun PlaylistEditOrAddScreen(
                 "image/*"
             )
         }
+    var sortOrderState by remember {
+        mutableStateOf(
+            SortOrderState(
+                SortOder.Desc,
+                SortParameter.Date
+            )
+        )
+    }
     val acceptedTracks = remember {
         mutableStateListOf<TrackInfoModel>().apply { addAll(playlist.tracks) }
     }
@@ -122,28 +134,48 @@ internal fun PlaylistEditOrAddScreen(
             addAll(allTracks.filter { it !in acceptedTracks })
         }
     }
-    var sortOrderState by remember {
-        mutableStateOf(
-            SortOrderState(
-                SortOder.Asc,
-                SortParameter.Date
+    LaunchedEffect(
+        allTracks
+    ) {
+        unacceptedTracks.clear()
+        unacceptedTracks.addAll(allTracks.filter { it !in acceptedTracks })
+    }
+    val onAcceptedTracksOptionClick = remember {
+        { t: TrackInfoModel ->
+            acceptedTracks.removeIf { it.id == t.id }
+            unacceptedTracks.removeIf { it.id == t.id }
+            val insertIndex = findInsertionIndex(
+                t,
+                unacceptedTracks,
+                sortOrder = sortOrderState
             )
-        )
+            unacceptedTracks.add(insertIndex, t)
+        }
+    }
+    val onUnAcceptedTracksOptionClick = remember {
+        { t: TrackInfoModel ->
+            Log.d("GAB_CHECK", t.id.toString())
+            unacceptedTracks.removeIf { it.id == t.id }
+            val insertIndex = findInsertionIndex(
+                t,
+                acceptedTracks,
+                sortOrder = sortOrderState
+            )
+            acceptedTracks.add(insertIndex, t)
+        }
     }
 
-    var isAlertVisible by remember { mutableStateOf(false) }
-    LaunchedEffect(sortOrderState) {
+
+    LaunchedEffect(allTracks, sortOrderState) {
         when (sortOrderState) {
             SortOrderState(SortOder.Asc, SortParameter.Date) -> {
                 acceptedTracks.sortBy { it.dateAdded }
                 unacceptedTracks.sortBy { it.dateAdded }
             }
-
             SortOrderState(SortOder.Desc, SortParameter.Date) -> {
                 acceptedTracks.sortByDescending { it.dateAdded }
                 unacceptedTracks.sortByDescending { it.dateAdded }
             }
-
             SortOrderState(SortOder.Asc, SortParameter.Title) -> {
                 acceptedTracks.sortBy { it.title }
                 unacceptedTracks.sortBy { it.title }
@@ -155,28 +187,27 @@ internal fun PlaylistEditOrAddScreen(
             }
         }
     }
+    var isAlertVisible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         viewModel.playlistCreationOrEditingResultFlow.collect {
             if (it) {
                 onReturn()
+            } else {
+                notUniquePlaylistNameErrorMessage("Имя плейлиста должно быть уникальным")
             }
         }
     }
     var areUnacceptedGoingFirst by remember { mutableStateOf(true) }
-    val trackElementModifier = Modifier.height(50.dp).fillMaxWidth()
+    val trackElementModifier = Modifier
+        .height(50.dp)
+        .fillMaxWidth()
 
-    val onAcceptedTracksOptionClick = remember { {t: TrackInfoModel ->
-        acceptedTracks.remove(t)
-        unacceptedTracks.add(t)
-    } }
-    val onUnAcceptedTracksOptionClick = remember { {t: TrackInfoModel ->
-        unacceptedTracks.remove(t)
-        acceptedTracks.add(t)
-    } }
+
     Column(modifier = modifier) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.background)
                 .weight(1f)
         ) {
             item {
@@ -303,6 +334,10 @@ internal fun PlaylistEditOrAddScreen(
                         value = title,
                         onValueChange = { title = it },
                         modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                        ),
                         label = {
                             Text(
                                 text = "Название плейлиста",
@@ -424,7 +459,7 @@ internal fun PlaylistEditOrAddScreen(
             Column(
                 modifier = Modifier
                     .fillMaxHeight(0.25f)
-                    .fillMaxWidth(0.80f)
+                    .fillMaxWidth(0.9f)
                     .background(
                         color = MaterialTheme.colorScheme.surface,
                         shape = RoundedCornerShape(16)
@@ -435,23 +470,24 @@ internal fun PlaylistEditOrAddScreen(
                 Text(
                     "Подтвердите удаление плейлиста ${playlist.title}",
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .wrapContentWidth(align = Alignment.CenterHorizontally)
                         .fillMaxHeight(0.5f)
                 )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.5f)
+                        .fillMaxHeight(0.5f),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Text(
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
+                            .wrapContentWidth(align = Alignment.CenterHorizontally)
                             .fillMaxHeight()
                             .clickable { isAlertVisible = false }, text = "Отмена"
                     )
                     Text(
                         modifier = Modifier
-                            .fillMaxWidth(1f)
+                            .wrapContentWidth(align = Alignment.CenterHorizontally)
                             .fillMaxHeight()
                             .clickable {
                                 viewModel.removePlaylist(playlist)
@@ -524,4 +560,26 @@ private fun PlaylistCreationTrackElement(
         }
 
     )
+}
+
+private fun findInsertionIndex(
+    track: TrackInfoModel,
+    list: List<TrackInfoModel>,
+    sortOrder: SortOrderState,
+): Int {
+    return when (sortOrder) {
+        SortOrderState(SortOder.Asc, SortParameter.Date) ->
+            list.indexOfFirst { it.dateAdded > track.dateAdded }.takeIf { it != -1 } ?: list.size
+
+        SortOrderState(SortOder.Desc, SortParameter.Date) ->
+            list.indexOfFirst { it.dateAdded < track.dateAdded }.takeIf { it != -1 } ?: list.size
+
+        SortOrderState(SortOder.Asc, SortParameter.Title) ->
+            list.indexOfFirst { it.title > track.title }.takeIf { it != -1 } ?: list.size
+
+        SortOrderState(SortOder.Desc, SortParameter.Title) ->
+            list.indexOfFirst { it.title < track.title }.takeIf { it != -1 } ?: list.size
+
+        else -> -1
+    }
 }

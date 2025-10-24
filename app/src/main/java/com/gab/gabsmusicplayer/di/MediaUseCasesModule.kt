@@ -7,6 +7,7 @@ import com.gab.model_media_usecases.usecases_api.GetCurrentTrackInfoFlowUseCase
 import com.gab.model_media_usecases.usecases_api.GetIsRepeatingOneFlowUseCase
 import com.gab.model_media_usecases.usecases_api.GetIsShuffleModeSetFlowUseCase
 import com.gab.model_media_usecases.usecases_api.GetIsTrackPlayingFlowUseCase
+import com.gab.model_media_usecases.usecases_api.GetNewTracksQueueSettingNotifierUseCase
 import com.gab.model_media_usecases.usecases_api.IsInitializedUseCase
 import com.gab.model_media_usecases.usecases_api.IsRepeatingOneStateChangeUseCase
 import com.gab.model_media_usecases.usecases_api.NextTrackUseCase
@@ -31,6 +32,7 @@ class MediaUseCasesModule {
         ModelMediaUseCasesComponent.get().getGetCurrentPositionFlowUseCase()
 
     @Provides
+    @ApplicationScope
     fun provideGetCurrentTrackInfoFlowUseCase(): GetCurrentTrackInfoFlowUseCase =
         ModelMediaUseCasesComponent.get().getGetCurrentTrackInfoFlowUseCase()
 
@@ -80,5 +82,8 @@ class MediaUseCasesModule {
     @Provides
     fun provideShuffleStateChangeUseCase(): ShuffleStateChangeUseCase =
         ModelMediaUseCasesComponent.get().getShuffleStateChangeUseCase()
+    @Provides
+    fun provideGetNewTracksQueueSettingNotifierUseCase(): GetNewTracksQueueSettingNotifierUseCase =
+        ModelMediaUseCasesComponent.get().getGetNewTracksQueueSettingNotifierUseCase()
 
 }

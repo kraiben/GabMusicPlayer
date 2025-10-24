@@ -1,6 +1,6 @@
 package com.gab.feature_playlists.di
 
-import com.gab.feature_playlists.holder.PlaylistFeatureHolder
+import com.gab.feature_api_playlists.PlaylistFeatureHolder
 import com.gab.feature_playlists.holder.PlaylistFeatureHolderImpl
 import dagger.Binds
 import dagger.Module

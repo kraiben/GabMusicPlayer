@@ -6,11 +6,14 @@ import com.gab.core_music_loading.impl.di.CoreMusicLoadingDependenciesStore
 import com.gab.core_settings.impl.di.CoreSettingsDependenciesStore
 import com.gab.feature_all_tracks.di.AllTracksFeatureDependenciesStore
 import com.gab.feature_options_menus.di.TrackOptionsMenuDependenciesStore
+import com.gab.feature_player.di.FeaturePlayerDependenciesStore
 import com.gab.feature_playlists.di.FeaturePlaylistDependenciesStore
 import com.gab.gabsmusicplayer.di.ApplicationComponent
 import com.gab.gabsmusicplayer.di.DaggerApplicationComponent
 import com.gab.model_media_usecases.di.ModelMediaUseCasesDependenciesStore
 import com.gab.model_module.di.DbUseCasesDependenciesStore
+import com.gab.navigation_module.di.NavigationModuleDependenciesStore
+import com.gab.theme_module.di.ThemeDependenciesStore
 
 class MusicApplication : Application() {
 
@@ -22,11 +25,14 @@ class MusicApplication : Application() {
         super.onCreate()
         CoreMusicLoadingDependenciesStore.deps = component
         CoreSettingsDependenciesStore.deps = component
-        DbUseCasesDependenciesStore.deps = component
         CoreMediaDependenciesStore.deps = component
+        DbUseCasesDependenciesStore.deps = component
         ModelMediaUseCasesDependenciesStore.deps = component
-        AllTracksFeatureDependenciesStore.deps = component
         TrackOptionsMenuDependenciesStore.deps = component
+        AllTracksFeatureDependenciesStore.deps = component
         FeaturePlaylistDependenciesStore.deps = component
+        FeaturePlayerDependenciesStore.deps = component
+        ThemeDependenciesStore.deps = component
+        NavigationModuleDependenciesStore.deps = component
     }
 }

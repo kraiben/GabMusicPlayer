@@ -1,11 +1,12 @@
 package com.gab.feature_playlists.holder
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import com.gab.feature_api_options_menus.PlaylistScreenMenuHolder
+import com.gab.feature_api_playlists.PlaylistFeatureHolder
 import com.gab.feature_playlists.ui.AllPlaylistsScreen
 import com.gab.feature_playlists.ui.PlaylistEditOrAddScreen
 import com.gab.feature_playlists.ui.SinglePlaylistScreen
@@ -18,16 +19,17 @@ import com.gab.feature_playlists.ui.navigation.PlaylistChangesScreenMode
 import com.gab.feature_playlists.ui.navigation.Screen
 import com.gab.feature_playlists.ui.navigation.playlistNavGraph
 import com.gab.music_entities_module.PlaylistInfoModel
-import com.gab.music_entities_module.TrackInfoModel
 import javax.inject.Inject
 
-public class PlaylistFeatureHolderImpl @Inject constructor(): PlaylistFeatureHolder {
+public class PlaylistFeatureHolderImpl @Inject constructor(
+    private val viewModelFactory: ViewModelProvider.Factory,
+    private val playlistScreenMenuHolder: PlaylistScreenMenuHolder
+): PlaylistFeatureHolder {
     override fun NavGraphBuilder.playlistsFeatureNavGraph(
         navHostController: NavHostController,
         modifier: Modifier,
-        viewModelFactory: ViewModelProvider.Factory,
-        trackOptionsMenuContent: @Composable ((TrackInfoModel, PlaylistInfoModel, () -> Unit) -> Unit),
         pictureSelectingErrorMsg: (String) -> Unit,
+        notUniquePlaylistNameErrorMessage: (String) -> Unit,
     ) {
         playlistNavGraph(
             allPlaylistsGridContent = {
@@ -41,13 +43,13 @@ public class PlaylistFeatureHolderImpl @Inject constructor(): PlaylistFeatureHol
                 SinglePlaylistScreen(
                     modifier = modifier,
                     playlistId = id,
+                    playlistScreenMenuHolder = playlistScreenMenuHolder,
                     viewModelFactory = viewModelFactory,
                     navigateToPlaylistEditScreen = { playlist ->
                         navHostController.navigateToPlaylistEditScreen(
                             playlist
                         )
-                    },
-                    trackOptionsMenuContent = trackOptionsMenuContent
+                    }
                 )
             },
             playlistEditOrAddScreenContent = { playlist: PlaylistInfoModel, screenMode: PlaylistChangesScreenMode ->
@@ -57,6 +59,7 @@ public class PlaylistFeatureHolderImpl @Inject constructor(): PlaylistFeatureHol
                     playlist = playlist,
                     screenMode = screenMode,
                     pictureSelectingErrorMsg = pictureSelectingErrorMsg,
+                    notUniquePlaylistNameErrorMessage = notUniquePlaylistNameErrorMessage,
                     onReturn = {
                         navHostController.returnFromPlaylistEditOrAddScreen()
                     },
