@@ -6,6 +6,7 @@ import com.gab.model_media_usecases.usecases_Impl.GetCurrentTrackInfoFlowUseCase
 import com.gab.model_media_usecases.usecases_Impl.GetIsRepeatingOneFlowUseCaseImpl
 import com.gab.model_media_usecases.usecases_Impl.GetIsShuffleModeSetFlowUseCaseImpl
 import com.gab.model_media_usecases.usecases_Impl.GetIsTrackPlayingFlowUseCaseImpl
+import com.gab.model_media_usecases.usecases_Impl.GetNewTracksQueueSettingNotifierUseCaseImpl
 import com.gab.model_media_usecases.usecases_Impl.IsInitializedUseCaseImpl
 import com.gab.model_media_usecases.usecases_Impl.IsRepeatingOneStateChangeUseCaseImpl
 import com.gab.model_media_usecases.usecases_Impl.NextTrackUseCaseImpl
@@ -21,6 +22,7 @@ import com.gab.model_media_usecases.usecases_api.GetCurrentTrackInfoFlowUseCase
 import com.gab.model_media_usecases.usecases_api.GetIsRepeatingOneFlowUseCase
 import com.gab.model_media_usecases.usecases_api.GetIsShuffleModeSetFlowUseCase
 import com.gab.model_media_usecases.usecases_api.GetIsTrackPlayingFlowUseCase
+import com.gab.model_media_usecases.usecases_api.GetNewTracksQueueSettingNotifierUseCase
 import com.gab.model_media_usecases.usecases_api.IsInitializedUseCase
 import com.gab.model_media_usecases.usecases_api.IsRepeatingOneStateChangeUseCase
 import com.gab.model_media_usecases.usecases_api.NextTrackUseCase
@@ -39,14 +41,19 @@ public interface ModelMediaUseCasesModule {
     @Binds
     public fun bindChangePositionUseCase(impl: ChangePositionUseCaseImpl): ChangePositionUseCase
     @Binds
+    @ModelMediaUseCasesScope
     public fun bindGetCurrentPositionFlowUseCase(impl: GetCurrentPositionFlowUseCaseImpl): GetCurrentPositionFlowUseCase
     @Binds
+    @ModelMediaUseCasesScope
     public fun bindGetCurrentTrackInfoFlowUseCase(impl: GetCurrentTrackInfoFlowUseCaseImpl): GetCurrentTrackInfoFlowUseCase
     @Binds
+    @ModelMediaUseCasesScope
     public fun bindGetIsRepeatingOneFlowUseCase(impl: GetIsRepeatingOneFlowUseCaseImpl): GetIsRepeatingOneFlowUseCase
     @Binds
+    @ModelMediaUseCasesScope
     public fun bindGetIsShuffleModeSetFlowUseCase(impl: GetIsShuffleModeSetFlowUseCaseImpl): GetIsShuffleModeSetFlowUseCase
     @Binds
+    @ModelMediaUseCasesScope
     public fun bindIsInitializedUseCase(impl: IsInitializedUseCaseImpl): IsInitializedUseCase
     @Binds
     public fun bindGetIsTrackPlayingFlowUseCase(impl: GetIsTrackPlayingFlowUseCaseImpl): GetIsTrackPlayingFlowUseCase
@@ -66,5 +73,7 @@ public interface ModelMediaUseCasesModule {
     public fun bindSetRandomTrackQueueUseCase(impl: SetRandomTrackQueueUseCaseImpl): SetRandomTrackQueueUseCase
     @Binds
     public fun bindShuffleStateChangeUseCase(impl: ShuffleStateChangeUseCaseImpl): ShuffleStateChangeUseCase
+    @Binds
+    public fun bindGetNewTracksQueueSettingNotifierUseCase(impl: GetNewTracksQueueSettingNotifierUseCaseImpl): GetNewTracksQueueSettingNotifierUseCase
 
 }

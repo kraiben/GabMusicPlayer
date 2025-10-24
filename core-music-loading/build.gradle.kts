@@ -8,4 +8,7 @@ android {
 }
 dependencies {
     implementation(projects.musicEntitiesModule)
+    implementation(libs.androidx.room)
+    kapt(libs.androidx.room.copiler)
+    implementation(libs.androidx.room.ktx)
 }

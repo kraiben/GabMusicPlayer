@@ -1,5 +1,6 @@
 package com.gab.feature_options_menus.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.gab.feature_options_menus.ui.base.OptionsMenuDivider
 import com.gab.feature_options_menus.ui.base.OptionsMenuElement
@@ -27,10 +29,15 @@ internal fun AddToNewPlaylistMenu(
     viewModel: TracksOptionsMenuViewModel,
     onDismiss: () -> Unit,
 ) {
-
+    val context = LocalContext.current
+    val toaster = Toast(context)
     LaunchedEffect(Unit) {
         viewModel.createPlaylistResultFlow.collect {
-            if (it) onDismiss()
+            if (it) onDismiss() else {
+                toaster.duration = Toast.LENGTH_SHORT
+                toaster.setText("Имя плейлиста должно быть уникально")
+                toaster.show()
+            }
         }
     }
     var text by remember { mutableStateOf("") }

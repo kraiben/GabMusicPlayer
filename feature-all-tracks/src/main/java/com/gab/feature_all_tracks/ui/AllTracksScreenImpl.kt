@@ -36,13 +36,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gab.feature_all_tracks.GAB_CHECK
+import com.gab.feature_api_options_menus.AllTracksScreenOptionsMenuHolder
 import com.gab.music_entities_module.TrackInfoModel
 
 @Composable
 internal fun AllTracksScreenImpl(
     modifier: Modifier = Modifier,
+    trackOptionsMenu: AllTracksScreenOptionsMenuHolder,
     menuButtonClickListener: () -> Unit = {},
-    trackOptionsMenuContent: @Composable ((track: TrackInfoModel, onDismiss: () -> Unit) -> Unit),
     trackAddedToQueryMessage: (String) -> Unit,
     viewModelFactory: ViewModelProvider.Factory,
 ) {
@@ -111,6 +112,7 @@ internal fun AllTracksScreenImpl(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Играть в случайном порядке",
+                                color = MaterialTheme.colorScheme.onBackground,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.W300,
                                 modifier = Modifier
@@ -142,7 +144,7 @@ internal fun AllTracksScreenImpl(
                                         setTracksQueue(index, sortedTracks)
                                     },
                                     onLongClick = {
-                                        trackAddedToQueryMessage("Добавлено в очередь")
+                                        trackAddedToQueryMessage("Добавлено следующим в очередь")
                                         setNextTrack(t)
                                     }
                                 ),
@@ -155,7 +157,7 @@ internal fun AllTracksScreenImpl(
                     }
                 }
                 currentOpenedMenuTrack?.let {
-                    trackOptionsMenuContent(it) {
+                    trackOptionsMenu.AllTracksScreenOptionsMenu (it) {
                         GAB_CHECK("onDismiss options menu")
                         currentOpenedMenuTrack = null
                     }

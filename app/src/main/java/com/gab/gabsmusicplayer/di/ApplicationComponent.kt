@@ -8,11 +8,14 @@ import com.gab.core_music_loading.impl.di.CoreMusicLoadingDependencies
 import com.gab.core_settings.impl.di.CoreSettingsDependencies
 import com.gab.feature_all_tracks.di.AllTracksFeatureDependencies
 import com.gab.feature_options_menus.di.TrackOptionsMenuDependencies
+import com.gab.feature_player.di.FeaturePlayerDependencies
 import com.gab.feature_playlists.di.FeaturePlaylistDependencies
 import com.gab.gabsmusicplayer.di.view_model.ViewModelModule
-import com.gab.gabsmusicplayer.ui.general.MainActivity
+import com.gab.gabsmusicplayer.ui.MainActivity
 import com.gab.model_media_usecases.di.ModelMediaUseCasesDependencies
 import com.gab.model_module.di.UseCasesDependencies
+import com.gab.navigation_module.di.NavigationModuleDependencies
+import com.gab.theme_module.di.ThemeDependencies
 import dagger.BindsInstance
 import dagger.Component
 
@@ -34,9 +37,10 @@ interface ApplicationComponent :
     ModelMediaUseCasesDependencies,
     AllTracksFeatureDependencies,
     TrackOptionsMenuDependencies,
-    FeaturePlaylistDependencies
-{
-
+    FeaturePlaylistDependencies,
+    FeaturePlayerDependencies,
+    ThemeDependencies,
+    NavigationModuleDependencies {
     override val dataStore: DataStore<Preferences>
 
     fun inject(mainActivity: MainActivity)

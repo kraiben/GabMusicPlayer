@@ -20,10 +20,12 @@ import java.io.File
 @Module
 class AppDataModule {
 
+    @ApplicationScope
     @Provides
     fun provideMediaPlayerRepository(): MediaPlayerRepository {
         return CoreMediaComponent.get().getMediaPlayerRepository()
     }
+    @ApplicationScope
     @Provides
     fun provideTracksListRepository(): TracksListRepository {
         return CoreMediaComponent.get().getTracksListRepository()

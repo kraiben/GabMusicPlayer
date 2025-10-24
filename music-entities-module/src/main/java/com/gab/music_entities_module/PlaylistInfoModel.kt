@@ -19,16 +19,23 @@ public data class PlaylistInfoModel(
     val coverUri: Uri,
     val fallbackCover: Int,
     val createdAt: Date,
-    ) {
+) {
     public fun toJson(): String = gson.toJson(this)
+
     public companion object {
-        public val EMPTY: PlaylistInfoModel = PlaylistInfoModel(-1, "", emptyList(), Uri.EMPTY, fallbackCover = -1,
+        public val EMPTY: PlaylistInfoModel = PlaylistInfoModel(
+            -1,
+            "",
+            emptyList(),
+            Uri.EMPTY,
+            fallbackCover = R.drawable.gpic_46,
             Date()
         )
 
         public fun fromJson(str: String): PlaylistInfoModel {
             return gson.fromJson(str, PlaylistInfoModel::class.java)
         }
+
         private object UriTypeAdapter : TypeAdapter<Uri>() {
             override fun write(out: JsonWriter, value: Uri) {
                 out.value(value.toString())
@@ -38,6 +45,7 @@ public data class PlaylistInfoModel(
                 return reader.nextString().toUri()
             }
         }
+
         private object DateTypeAdapter : TypeAdapter<Date>() {
             override fun write(out: JsonWriter, value: Date) {
                 out.value(value.time)

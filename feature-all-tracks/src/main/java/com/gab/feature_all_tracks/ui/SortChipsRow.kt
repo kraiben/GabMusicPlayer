@@ -70,8 +70,8 @@ private fun SortChip(
         colors = InputChipDefaults.inputChipColors(
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            disabledLabelColor = MaterialTheme.colorScheme.onSecondaryContainer
+            containerColor = MaterialTheme.colorScheme.background,
+            labelColor = MaterialTheme.colorScheme.onBackground,
         )
     )
 }

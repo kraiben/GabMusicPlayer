@@ -47,6 +47,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.gab.feature_api_options_menus.PlaylistScreenMenuHolder
 import com.gab.feature_playlists.ui.components.LoadingCircle
 import com.gab.feature_playlists.ui.components.PlaylistsScreenState
 import com.gab.feature_playlists.ui.components.TrackListElement
@@ -56,9 +57,9 @@ import com.gab.music_entities_module.TrackInfoModel
 @Composable
 internal fun SinglePlaylistScreen(
     modifier: Modifier = Modifier,
+    playlistScreenMenuHolder: PlaylistScreenMenuHolder,
     playlistId: Long,
     navigateToPlaylistEditScreen: (PlaylistInfoModel) -> Unit,
-    trackOptionsMenuContent: @Composable ((TrackInfoModel, PlaylistInfoModel, () -> Unit) -> Unit),
     viewModelFactory: ViewModelProvider.Factory,
 ) {
     val viewModel = viewModel<PlaylistsFeatureViewModel>(factory = viewModelFactory)
@@ -69,11 +70,9 @@ internal fun SinglePlaylistScreen(
         PlaylistsScreenState.Initial -> {
             LoadingCircle()
         }
-
         PlaylistsScreenState.Loading -> {
             LoadingCircle()
         }
-
         is PlaylistsScreenState.Playlists -> {
             val playlist = _playlists.playlists.find { it.id == playlistId } ?: PlaylistInfoModel.EMPTY
             Box() {
@@ -196,7 +195,7 @@ internal fun SinglePlaylistScreen(
                     }
                 }
                 currentOpenedMenuTrack?.let {
-                    trackOptionsMenuContent(it, playlist) {
+                    playlistScreenMenuHolder.PlaylistScreenMenu (playlist, it ) {
                         currentOpenedMenuTrack = null
                     }
                 }

@@ -29,7 +29,6 @@ android {
 }
 
 dependencies {
-
     implementation(projects.coreMusicLoading)
     implementation(projects.coreSettings)
     implementation(projects.coreMedia)
@@ -37,8 +36,16 @@ dependencies {
     implementation(projects.musicEntitiesModule)
     implementation(projects.modelMediaUsecases)
     implementation(projects.featureAllTracks)
+    implementation(projects.featureApiAllTracks)
     implementation(projects.featureOptionsMenus)
+    implementation(projects.featureApiOptionsMenus)
     implementation(projects.featurePlaylists)
+    implementation(projects.featureApiPlaylists)
+    implementation(projects.featurePlayer)
+    implementation(projects.featureApiPlayer)
+    implementation(projects.themeModule)
+    implementation(projects.themeApiModule)
+    implementation(projects.navigationModule)
 
     implementation(libs.datastore.preferences)
 
